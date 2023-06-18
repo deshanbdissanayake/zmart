@@ -62,6 +62,7 @@ const styles = StyleSheet.create({
     fontFamily: 'poppins',
     fontWeight: 'bold',
     fontSize: 24,
+    color: colors.textDark,
   },
   welcomeWrapper: {
     flex: 2,
@@ -71,6 +72,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   welcomeTitle: {
+    color: colors.textDark,
     fontFamily: 'montserrat',
     fontWeight: 'bold',
     fontSize: 24,
@@ -78,6 +80,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   welcomeDescription: {
+    color: colors.textDark,
     fontFamily: 'montserrat',
     fontWeight: 'regular',
     fontSize: 14,

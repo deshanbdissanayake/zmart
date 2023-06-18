@@ -47,6 +47,7 @@ const styles = StyleSheet.create({
     fontFamily: 'poppins',
     fontWeight: 'bold',
     fontSize: 24,
+    color: colors.textDark,
   },
   circleTopRight: {
     position: 'absolute',

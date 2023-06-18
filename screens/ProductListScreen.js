@@ -20,7 +20,7 @@ import { log_data } from '../assets/data/system';
 
 const ProductListScreen = ({ route }) => {
   const { propsData } = route.params;
-  
+
   const [search, setSearch] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [products, setProducts] = useState([]);
@@ -277,6 +277,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   proListTitle: {
+    color: colors.textDark,
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,

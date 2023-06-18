@@ -123,6 +123,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   nameStyles: {
+    color: colors.textDark,
     fontSize: 14,
     fontWeight: 'bold',
     flex: 10,
@@ -131,6 +132,7 @@ const styles = StyleSheet.create({
     flex: 2,
   },
   priceStyles: {
+    color: colors.textDark,
     fontSize: 16,
   },
   qtyWrapper: {
@@ -148,6 +150,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   statusText: {
+    color: colors.textDark,
     fontSize: 12,
   },
   statusDot: {
