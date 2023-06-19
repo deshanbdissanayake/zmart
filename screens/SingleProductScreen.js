@@ -6,17 +6,18 @@ import {
   ActivityIndicator,
   SafeAreaView,
   TouchableOpacity,
+  Image,
+  ScrollView,
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from 'react-native-vector-icons';
 import colors from '../assets/colors/colors';
 import Header from '../components/header/Header';
 import { getProductByProId } from '../assets/data/product';
-import Slider from '../components/products/Slider';
-import { ScrollView } from 'react-native-gesture-handler';
 
 const SingleProductScreen = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [productData, setProductData] = useState([]);
+  const [mainImage, setMainImage] = useState('');
 
   useEffect(() => {
     fetchProductData();
@@ -27,11 +28,16 @@ const SingleProductScreen = () => {
     try {
       const response = await getProductByProId(1);
       setProductData(response);
+      setMainImage(response.images[0]);
     } catch (error) {
       console.log('Error fetching products:', error);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const changeMainImage = (image) => {
+    setMainImage(image);
   };
 
   const renderLoadingIndicator = () => (
@@ -41,52 +47,91 @@ const SingleProductScreen = () => {
   );
 
   const renderProductList = () => {
-    const {
-      status,
-      images,
-      name,
-      price,
-      qty,
-      desc
-    } = productData;
+    const { status, images, name, price, qty, desc } = productData;
 
-    const statusStyles = [styles.statusStyles, status == 'active' ? styles.activeStatusStyles : styles.pauseStatusStyles];
+    const statusStyles = [
+      styles.statusStyles,
+      status == 'active'
+        ? styles.activeStatusStyles
+        : styles.pauseStatusStyles,
+    ];
     const stockColor = qty > 0 ? colors.green : colors.red;
 
     return (
       <View style={styles.content}>
-
         <Header />
-
         <ScrollView showsVerticalScrollIndicator={false}>
           <Text style={statusStyles}>{status}</Text>
-          <Slider images={images} />
+          <View style={styles.topWrapper}>
+            <View style={styles.mainImageWrapper}>
+              <Image
+                style={styles.mainImageStyles}
+                source={mainImage}
+                alt="main image"
+              />
+            </View>
+            <View style={styles.smallImageWrapper}>
+              {images.map((image, index) => (
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => changeMainImage(image)}
+                >
+                  <Image
+                    style={styles.smallImageStyles}
+                    source={image}
+                    alt={`image ${index + 1}`}
+                  />
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
           <View style={styles.bottomWrapper}>
             <Text style={styles.nameStyle}>{name}</Text>
             <View style={styles.priceWrapper}>
-                <View style={styles.qtyWrapper}>
-                    <View style={styles.stockTextWrapper}>
-                    <Text style={[styles.stockTextStyle, { color: stockColor }]}>
-                        {qty > 0 ? 'In Stock' : 'Out of Stock'}
-                    </Text>
-                    <View style={[styles.dotStyle, { backgroundColor: stockColor }]}></View>
-                    </View>
-                    <Text style={styles.qtyStyle}>Avb Qty : {qty}</Text>
+              <View style={styles.qtyWrapper}>
+                <View style={styles.stockTextWrapper}>
+                  <View
+                    style={[styles.dotStyle, { backgroundColor: stockColor }]}
+                  ></View>
+                  <Text
+                    style={[
+                      styles.stockTextStyle,
+                      { color: stockColor },
+                    ]}
+                  >
+                    {qty > 0 ? 'In Stock' : 'Out of Stock'}
+                  </Text>
                 </View>
-                <View style={styles.middleBorder}></View>
-                <Text style={styles.priceStyle}>Rs.{parseFloat(price).toFixed(2)}</Text>
+                <Text style={styles.qtyStyle}>Avb Qty : {qty}</Text>
+              </View>
+              <Text style={styles.priceStyle}>
+                Rs.{parseFloat(price).toFixed(2)}
+              </Text>
             </View>
             <Text style={styles.descStyle}>{desc}</Text>
           </View>
         </ScrollView>
 
         <View style={styles.bottomButtonsWrapper}>
-          <TouchableOpacity style={styles.bottomButtonStyles}><Ionicons name="trash-bin" size={24} color={colors.red} /></TouchableOpacity>
-          <TouchableOpacity style={styles.bottomButtonStyles}><MaterialCommunityIcons name="circle-edit-outline" size={24} color={colors.secondary} /></TouchableOpacity>
-          <TouchableOpacity style={styles.bottomButtonStyles}><Ionicons name="md-pause-circle" size={24} color={colors.secondary} /></TouchableOpacity>
+          <TouchableOpacity style={styles.bottomButtonStyles}>
+            <Ionicons name="trash-bin" size={24} color={colors.red} />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.bottomButtonStyles}>
+            <MaterialCommunityIcons
+              name="circle-edit-outline"
+              size={24}
+              color={colors.secondary}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.bottomButtonStyles}>
+            <Ionicons
+              name="md-pause-circle"
+              size={24}
+              color={colors.secondary}
+            />
+          </TouchableOpacity>
           {/*<TouchableOpacity><Ionicons name="md-play-circle" size={24} color={colors.secondary} /></TouchableOpacity>*/}
         </View>
-
       </View>
     );
   };
@@ -133,22 +178,51 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     borderRadius: 10,
   },
+  topWrapper: {
+    flex: 1,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+  },
+  mainImageWrapper: {
+    height: 250,
+    marginBottom: 10,
+  },
+  mainImageStyles: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: colors.gray,
+  },
+  smallImageWrapper: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  smallImageStyles: {
+    width: 100,
+    height: 80,
+    resizeMode: 'cover',
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: colors.gray,
+  },
   bottomWrapper: {
     flex: 1,
     paddingVertical: 10,
     paddingHorizontal: 20,
   },
   nameStyle: {
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: 'bold',
     color: colors.textDark,
-    marginBottom: 10,
-    textAlign: 'justify',
+    marginBottom: 15,
   },
   priceWrapper: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 10,
+    marginBottom: 15,
   },
   qtyWrapper: {
     flexDirection: 'column',
@@ -168,20 +242,20 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: colors.gray,
   },
-  middleBorder: {
-    borderRightWidth: 1,
-    borderColor: colors.gray,
-  },
   priceStyle: {
     fontSize: 18,
     fontWeight: 'bold',
     color: colors.textDark,
     textAlignVertical: 'center',
+    backgroundColor: colors.secondary,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 10,
   },
   descStyle: {
     fontSize: 14,
     color: colors.textDark,
-    marginBottom: 5,
+    marginBottom: 15,
     textAlign: 'justify',
   },
   bottomButtonsWrapper: {

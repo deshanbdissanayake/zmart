@@ -48,7 +48,7 @@ export default Slider;
 const styles = StyleSheet.create({
   sliderCard: {
     height: 250,
-    paddingVertical: 10,
+    paddingVertical: 15,
     paddingHorizontal: 20,
   },
   slide: {
