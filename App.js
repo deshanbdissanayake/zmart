@@ -54,11 +54,11 @@ function App() {
           component={WelcomeScreen}
           options={{ headerShown: false }}
         />*/}
-        {/*<Stack.Screen
+        <Stack.Screen
           name="Registration"
           component={RegistrationScreen}
           options={{ headerShown: false }}
-      />*/}
+        />
       {/*<Stack.Screen
           name="Add Product"
           component={AddProductScreen}
@@ -81,11 +81,11 @@ function App() {
           component={SingleProductScreen}
           options={{ headerShown: false }}
       />*/}
-      <Stack.Screen
+      {/*<Stack.Screen
           name="Selected Product"
           component={SelectedProductsListScreen}
           options={{ headerShown: false }}
-      />
+      />*/}
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
-  KeyboardAvoidingView, // Import KeyboardAvoidingView
+  KeyboardAvoidingView,
   Platform,
 } from 'react-native';
 import { Ionicons } from 'react-native-vector-icons';
@@ -541,6 +541,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flexDirection: 'row',
     width: '100%',
+    flex: 1,
   },
   inputNumberCode: {
     flex: 2,
