@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import colors from '../../assets/colors/colors';
 import { MaterialCommunityIcons } from 'react-native-vector-icons';
@@ -15,6 +16,16 @@ const ProductItem = ({ product, props }) => {
     props.checkCountFunc(isChecked ? -1 : 1); // Increment count if checkbox is checked, decrement if unchecked
   };
 
+  const navigation = useNavigation();
+
+  const handleTouchableOpacityPress = () => {
+    const myArray = ['item1', 'item2', 'item3']; // Example array
+
+    navigation.navigate('Single Product', {
+      myArray: myArray,
+    });
+  };
+
   return (
     <View style={styles.container}>
       {((props.shareBtnClicked || props.invoiceBtnClicked || props.stockBtnClicked) && log_data.log_userType === 'supplier') ? (
@@ -29,16 +40,18 @@ const ProductItem = ({ product, props }) => {
 
       <View style={styles.cardWrapper}>
         <View style={styles.imageWrapper}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleTouchableOpacityPress}>
             <Image source={product.image} style={styles.imageStyles} />
           </TouchableOpacity>
         </View>
         <View style={styles.textWrapper}>
           <View style={styles.nameWrapper}>
-            <Text style={styles.nameStyles} numberOfLines={2}>
-              {product.name}
-            </Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={handleTouchableOpacityPress} style={styles.nameTO}>
+              <Text style={styles.nameStyles} numberOfLines={2}>
+                {product.name}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleTouchableOpacityPress}>
               <MaterialCommunityIcons
                 style={styles.iconStyles}
                 name="chevron-double-right"
@@ -122,11 +135,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
+  nameTO: {
+    flex: 10,
+  },
   nameStyles: {
     color: colors.textDark,
     fontSize: 14,
     fontWeight: 'bold',
-    flex: 10,
   },
   iconStyles: {
     flex: 2,

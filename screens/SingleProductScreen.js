@@ -59,7 +59,7 @@ const SingleProductScreen = () => {
 
     return (
       <View style={styles.content}>
-        <Header />
+        {/*<Header />*/}
         <ScrollView showsVerticalScrollIndicator={false}>
           <Text style={statusStyles}>{status}</Text>
           <View style={styles.topWrapper}>
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   nameStyle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     color: colors.textDark,
     marginBottom: 15,

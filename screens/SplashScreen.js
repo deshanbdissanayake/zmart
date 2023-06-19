@@ -7,7 +7,7 @@ const SplashScreen = ({ navigation }) => {
   useEffect(() => {
     // Simulating a delay before navigating to the next screen
     setTimeout(() => {
-      navigation.navigate('Home');
+      navigation.navigate('Main');
     }, 2000); // Adjust the delay time as needed
   }, [navigation]);
 
@@ -21,7 +21,7 @@ const SplashScreen = ({ navigation }) => {
         <Text style={styles.logoText}>{log_data.sys_name}</Text>
       </View>
       <View style={styles.circleTopRight} />
-      <View style={styles.circleBottomLeft} /> 
+      <View style={styles.circleBottomLeft} />
     </View>
   );
 };
@@ -44,7 +44,6 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   logoText: {
-    fontFamily: 'poppins',
     fontWeight: 'bold',
     fontSize: 24,
     color: colors.textDark,

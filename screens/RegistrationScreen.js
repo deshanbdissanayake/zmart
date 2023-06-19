@@ -143,7 +143,7 @@ const RegistrationScreen = () => {
         setButtonLoading(true);
 
         //save user data
-        saveUserFunc(formData);
+        saveUserFunc();
       }
     }
   };
@@ -229,6 +229,13 @@ const RegistrationScreen = () => {
     sendOtpFunc();
   };
 
+  const goBack = () => {
+    setOtp('');
+    setOtpSent(false);
+    setShowResend(false);
+    setPhoneNumberVerified(false);
+  };
+
   {
     /* ========================================================================================= */
   }
@@ -236,9 +243,12 @@ const RegistrationScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.headerWrapper}>
-        <TouchableOpacity>
-          <Ionicons name="arrow-back" size={24} color="black" />
-        </TouchableOpacity>
+        {(otpSent && !phoneNumberVerified) ? (
+          <TouchableOpacity onPress={goBack}>
+            <Ionicons name="arrow-back" size={24} color="black" />
+          </TouchableOpacity>
+        ): ('')}
+
         <View style={styles.registrationWrapper}>
           <Text style={styles.registrationTitle}>Create an Account</Text>
           <Text style={styles.registrationDescription}>
@@ -261,7 +271,7 @@ const RegistrationScreen = () => {
               <View style={styles.formGroup}>
                 <View style={styles.formContainer}>
                   <TextInput
-                    style={[styles.input, styles.inputNumberCode]}
+                    style={[styles.input, styles.inputNumberCode, styles.disabled]}
                     placeholder="Enter phone number"
                     value={'+94'}
                     editable={false}
@@ -563,6 +573,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   buttonStyle: {
+    minWidth: 220,
     width: '100%',
     padding: 10,
     borderRadius: 10,
@@ -580,6 +591,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     marginTop: 20,
     textDecorationLine: 'underline',
+    alignSelf: 'center',
   },
 
   //=========================================================

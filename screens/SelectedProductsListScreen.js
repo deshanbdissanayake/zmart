@@ -17,27 +17,26 @@ import Header from '../components/header/Header';
 
 const ListItem = ({ item, index }) => {
     const isFirstItem = index === 0;
-  
+
     return (
         <View style={[styles.productItem, isFirstItem && styles.firstProductItem]}>
             <Text style={styles.productName} numberOfLines={3}>{item.name}</Text>
             <Text style={styles.productPrice}>{parseFloat(item.price).toFixed(2)}</Text>
-            <TextInput 
-                style={[styles.qtyStyles, styles.oldQtyStyles, styles.disabled]} 
-                value={item.qty.toString()}  
-                editable={false} 
-                keyboardType="numeric" 
+            <TextInput
+                style={[styles.qtyStyles, styles.oldQtyStyles, styles.disabled]}
+                value={item.qty.toString()}
+                editable={false}
+                keyboardType="numeric"
             />
-            <TextInput 
-                placeholder="New Qty" 
-                style={[styles.qtyStyles, styles.newQtyStyles]} 
-                editable={true} 
+            <TextInput
+                placeholder="New Qty"
+                style={[styles.qtyStyles, styles.newQtyStyles]}
+                editable={true}
                 keyboardType="numeric"
             />
         </View>
     );
   };
-  
 
 const SelectedProductsListScreen = () => {
     const props = {
@@ -118,7 +117,7 @@ const SelectedProductsListScreen = () => {
         </View>
     </View>
   );
-}; 
+};
 
 const styles = StyleSheet.create({
   container: {

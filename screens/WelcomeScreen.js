@@ -59,7 +59,6 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   logoText: {
-    fontFamily: 'poppins',
     fontWeight: 'bold',
     fontSize: 24,
     color: colors.textDark,
@@ -73,7 +72,6 @@ const styles = StyleSheet.create({
   },
   welcomeTitle: {
     color: colors.textDark,
-    fontFamily: 'montserrat',
     fontWeight: 'bold',
     fontSize: 24,
     marginTop: 20,
@@ -81,7 +79,6 @@ const styles = StyleSheet.create({
   },
   welcomeDescription: {
     color: colors.textDark,
-    fontFamily: 'montserrat',
     fontWeight: 'regular',
     fontSize: 14,
     marginBottom: 40,
@@ -104,7 +101,6 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   buttonText: {
-    fontFamily: 'montserrat',
     fontWeight: 'bold',
     fontSize: 14,
   },

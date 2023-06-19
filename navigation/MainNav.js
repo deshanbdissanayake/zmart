@@ -4,20 +4,19 @@ import { NavigationContainer } from '@react-navigation/native';
 import { Keyboard } from 'react-native';
 
 // Import your screens or components
-import RegistrationScreen from './screens/RegistrationScreen';
+import RegistrationScreen from '../screens/RegistrationScreen';
 
-import { log_data } from './assets/data/system';
+import { log_data } from '../assets/data/system';
 
 // Screens and Navigators
-import SplashScreen from './screens/SplashScreen';
-import HomeNav from './navigation/HomeNav';
-import MainNav from './navigation/MainNav';
+import SplashScreen from '../screens/SplashScreen';
+import HomeNav from '../navigation/HomeNav';
 
 
 // Create a stack navigator
 const Stack = createStackNavigator();
 
-function App() {
+function MainNav() {
 
   //================================================================
   // unfocus from text inputs when keyboard hides
@@ -38,21 +37,22 @@ function App() {
   //================================================================
 
   return (
-    <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen
-          name="Splash"
-          component={SplashScreen}
-          options={{ headerShown: false }}
+        {!log_data.log_status ? (
+            <Stack.Screen
+            name="Registration"
+            component={RegistrationScreen}
+            options={{ headerShown: false }}
         />
-        <Stack.Screen
-          name="Main"
-          component={MainNav}
-          options={{ headerShown: false }}
-        />
+        ) : (
+            <Stack.Screen
+            name="Home"
+            component={HomeNav}
+            options={{ headerShown: false }}
+            />
+        )}
       </Stack.Navigator>
-    </NavigationContainer>
   );
 }
 
-export default App;
+export default MainNav;
