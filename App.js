@@ -10,6 +10,7 @@ import SplashScreen from './screens/SplashScreen';
 import RegistrationScreen from './screens/RegistrationScreen';
 import AddProductScreen from './screens/AddProductScreen';
 import ProductListScreen from './screens/ProductListScreen';
+import SingleProductScreen from './screens/SingleProductScreen';
 
 // Create a stack navigator
 const Stack = createStackNavigator();
@@ -68,11 +69,16 @@ function App() {
           options={{ headerShown: false }}
           initialParams={{ propsData: { type : 'productList'} }} 
       />*/}
-      <Stack.Screen
+      {/*<Stack.Screen
           name="My Products"
           component={ProductListScreen}
           options={{ headerShown: false }}
           initialParams={{ propsData: { type : 'myProducts'} }}
+      />*/}
+      <Stack.Screen
+          name="Single Product"
+          component={SingleProductScreen}
+          options={{ headerShown: false }}
       />
       </Stack.Navigator>
     </NavigationContainer>
