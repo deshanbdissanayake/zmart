@@ -7,9 +7,8 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from 'react-native-vector-icons';
 import colors from '../assets/colors/colors';
 
@@ -48,8 +47,9 @@ const RegistrationScreen = () => {
   const [buttonLoading, setButtonLoading] = useState(false); //button get disabled while loading
   const [otpSent, setOtpSent] = useState(false);
   const [showResend, setShowResend] = useState(false);
-
   const [phoneNumberVerified, setPhoneNumberVerified] = useState(false);
+
+  const navigation = useNavigation();
 
   {
     /* ========================================================================================= */
@@ -210,6 +210,7 @@ const RegistrationScreen = () => {
       .then((verifyStatus) => {
         if (verifyStatus) {
           console.log('user saved');
+          navigation.navigate('Home');
         }
       })
       .catch((error) => {
@@ -300,7 +301,7 @@ const RegistrationScreen = () => {
               <View style={styles.formGroup}>
                 <View>
                   <TextInput
-                    style={styles.input}
+                    style={[styles.input, styles.otpStyles]}
                     placeholder="Enter OTP"
                     value={otp}
                     onChangeText={setOtp}
@@ -571,6 +572,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 10,
     width: '100%',
+  },
+  otpStyles: {
+    textAlign: 'center',
   },
   buttonStyle: {
     minWidth: 220,

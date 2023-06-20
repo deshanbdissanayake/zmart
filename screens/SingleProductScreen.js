@@ -12,8 +12,11 @@ import {
 import { Ionicons, MaterialCommunityIcons } from 'react-native-vector-icons';
 import colors from '../assets/colors/colors';
 import { getProductByProId } from '../assets/data/product';
+import Footer from '../components/footer/Footer';
 
-const SingleProductScreen = () => {
+const SingleProductScreen = ({ route }) => {
+  const { propsData } = route.params;
+
   const [isLoading, setIsLoading] = useState(true);
   const [productData, setProductData] = useState([]);
   const [mainImage, setMainImage] = useState('');
@@ -110,26 +113,30 @@ const SingleProductScreen = () => {
           </View>
         </ScrollView>
 
-        <View style={styles.bottomButtonsWrapper}>
-          <TouchableOpacity style={styles.bottomButtonStyles}>
-            <Ionicons name="trash-bin" size={24} color={colors.red} />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.bottomButtonStyles}>
-            <MaterialCommunityIcons
-              name="circle-edit-outline"
-              size={24}
-              color={colors.secondary}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.bottomButtonStyles}>
-            <Ionicons
-              name="md-pause-circle"
-              size={24}
-              color={colors.secondary}
-            />
-          </TouchableOpacity>
-          {/*<TouchableOpacity><Ionicons name="md-play-circle" size={24} color={colors.secondary} /></TouchableOpacity>*/}
-        </View>
+        {propsData.type === 'myProducts' ? (            
+          <View style={styles.bottomButtonsWrapper}>
+            <TouchableOpacity style={styles.bottomButtonStyles}>
+              <Ionicons name="trash-bin" size={24} color={colors.red} />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.bottomButtonStyles}>
+              <MaterialCommunityIcons
+                name="circle-edit-outline"
+                size={24}
+                color={colors.secondary}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.bottomButtonStyles}>
+              <Ionicons
+                name="md-pause-circle"
+                size={24}
+                color={colors.secondary}
+              />
+            </TouchableOpacity>
+            {/*<TouchableOpacity><Ionicons name="md-play-circle" size={24} color={colors.secondary} /></TouchableOpacity>*/}
+          </View>
+        ): 
+          <Footer />
+        }
       </View>
     );
   };
@@ -158,7 +165,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     zIndex: 10,
     right: 30,
-    top: 20,
+    top: 30,
   },
   activeStatusStyles: {
     paddingVertical: 5,
@@ -178,7 +185,7 @@ const styles = StyleSheet.create({
   },
   topWrapper: {
     flex: 1,
-    paddingVertical: 15,
+    paddingVertical: 20,
     paddingHorizontal: 20,
   },
   mainImageWrapper: {

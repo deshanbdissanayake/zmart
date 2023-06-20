@@ -6,6 +6,7 @@ import ProductListScreen from '../screens/ProductListScreen';
 import SingleProductScreen from '../screens/SingleProductScreen';
 import AddProductScreen from '../screens/AddProductScreen';
 import Header from '../components/header/Header';
+import colors from '../assets/colors/colors';
 
 
 // Create a stack navigator
@@ -16,11 +17,11 @@ function MyProListNav() {
   return (
       <Stack.Navigator>
         <Stack.Screen
-          name="My Products"
+          name="My Products List"
           component={ProductListScreen}
           options={{
             header: ({ navigation }) => (
-              <Header navigation={navigation} title="My Products" />
+              <Header navigation={navigation} title="My Products List" />
             ),
           }}
           initialParams={{
@@ -29,13 +30,34 @@ function MyProListNav() {
         />
         <Stack.Screen
           name="Single Product"
-          component={SingleProductScreen}
-          options={{ headerShown: true }}
+          component={SingleProductScreen} 
+          options={{
+            headerStyle: {
+              backgroundColor: colors.bgDark,
+            },
+            headerTitleStyle: {
+              color: colors.textLight,
+            },
+            headerTintColor: colors.secondary,
+            headerShown: true,
+          }}
+          initialParams={{
+            propsData: { type: 'myProducts' },
+          }} 
         />
         <Stack.Screen
           name="Edit Product"
           component={AddProductScreen}
-          options={{ headerShown: true }}
+          options={{
+            headerStyle: {
+              backgroundColor: colors.bgDark,
+            },
+            headerTitleStyle: {
+              color: colors.textLight,
+            },
+            headerTintColor: colors.secondary,
+            headerShown: true,
+          }}
         />
       </Stack.Navigator>
   );

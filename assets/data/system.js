@@ -1,6 +1,6 @@
 const log_data = {
     sys_name : 'WHOLESALE',
-    log_status : true,
+    log_status : false,
     log_userToken : 'token-714124766',
     log_userNumber : '714124766',
     log_userName : 'Desh',

@@ -5,6 +5,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import ProductListScreen from '../screens/ProductListScreen';
 import SingleProductScreen from '../screens/SingleProductScreen';
 import Header from '../components/header/Header';
+import colors from '../assets/colors/colors';
 
 // Create a stack navigator
 const Stack = createStackNavigator();
@@ -28,7 +29,19 @@ function ProListNav() {
         <Stack.Screen
           name="Single Product"
           component={SingleProductScreen}
-          options={{ headerShown: true }}
+          options={{
+            headerStyle: {
+              backgroundColor: colors.bgDark,
+            },
+            headerTitleStyle: {
+              color: colors.textLight,
+            },
+            headerTintColor: colors.secondary,
+            headerShown: true,
+          }}
+          initialParams={{
+            propsData: { type: 'productList' },
+          }}
         />
       </Stack.Navigator>
   );

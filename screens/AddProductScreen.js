@@ -6,8 +6,9 @@ import {
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
+  ScrollView,
 } from 'react-native';
-import { Ionicons, Entypo } from 'react-native-vector-icons'; 
+import { MaterialCommunityIcons, Entypo, Ionicons } from 'react-native-vector-icons'; 
 import colors from '../assets/colors/colors';
 
 import { addProduct } from '../assets/data/product';
@@ -55,12 +56,13 @@ const AddProductScreen = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.formWrapper}>
-          <View
-            showsVerticalScrollIndicator={false}
-            style={styles.scrollContainer}
-            keyboardShouldPersistTaps="handled">
 
+        <View style={styles.formWrapper}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.scrollContainer}
+            keyboardShouldPersistTaps="handled"
+          >
             <View style={styles.formGroup}>
               <View style={styles.formContainer}>
                 <TextInput
@@ -128,54 +130,53 @@ const AddProductScreen = () => {
                 />
               </View>
             </View>     
+          </ScrollView>
+        </View>
 
-            <View style={styles.bottomButtonsWrapper}>
-              {buttonLoading ? (
-                <View style={styles.bottomButtonStyles}>
-                  <ActivityIndicator color={colors.white} />
-                </View>
-              ) : (
-                <>
-                  <TouchableOpacity style={styles.bottomButtonStyles}>
-                    <Ionicons name="arrow-undo" size={24} color={colors.secondary} />
-                  </TouchableOpacity>
-                    
-                  <TouchableOpacity style={styles.bottomButtonStyles} onPress={handleButtonClick}>
-                    <Entypo name="circle-with-plus" size={24} color={colors.secondary} />
-                  </TouchableOpacity>
-                </>
-              )}
+        <View style={styles.bottomButtonsWrapper}>
+          {buttonLoading ? (
+            <View style={styles.bottomButtonStyles}>
+              <ActivityIndicator color={colors.white} />
             </View>
+          ) : (
+            <>
+              <TouchableOpacity style={styles.bottomButtonStyles}>
+                <MaterialCommunityIcons name="cancel" size={24} color={colors.red} />
+              </TouchableOpacity>
+                
+              <TouchableOpacity style={styles.bottomButtonStyles} onPress={handleButtonClick}>
+                <Entypo name="circle-with-plus" size={24} color={colors.secondary} />
+              </TouchableOpacity>
+            </>
+          )}
+        </View>    
 
-            </View>
-        </View>        
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-    container: {
+      container: {
         flex: 1,
       },
       formWrapper: {
         flex: 1,
         backgroundColor: colors.bgLight,
-        justifyContent: 'center',
-        alignItems: 'center',
+      },
+      scrollContainer:{
+        flexGrow: 1,
+        justifyContent: 'space-around',
         paddingHorizontal: 20,
         paddingVertical: 20,
-      },
-      scrollContainer: {
-        flexDirection: 'column',
-        justifyContent: 'space-between',
       },
       formGroup: {
         flexDirection: 'column',
         marginBottom: 10,
       },
       formContainer: {
-        justifyContent: 'space-between',
+        width: '100%',
         flexDirection: 'row',
+        justifyContent: 'space-between',
       },
       disabled: {
         backgroundColor: colors.disabled,
@@ -220,7 +221,7 @@ const styles = StyleSheet.create({
 
       textarea : {
         width: '100%',
-        height: 100,
+        height: 200,
         borderColor: colors.border,
         color: colors.textDark,
         borderWidth: 1,

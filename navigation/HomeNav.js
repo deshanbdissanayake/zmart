@@ -9,13 +9,15 @@ import {
   View,
   Text,
   StyleSheet,
+  TouchableOpacity,
 } from 'react-native';
-
+import { FontAwesome5, Ionicons } from 'react-native-vector-icons'; 
 
 // Import your screens or components
 import ProListNav from './ProListNav';
 import MyProListNav from './MyProListNav';
 import AddProductScreen from '../screens/AddProductScreen';
+import colors from '../assets/colors/colors';
 
 const Drawer = createDrawerNavigator();
 
@@ -26,18 +28,31 @@ const CustomDrawerContent = ({ navigation, state, descriptors }) => {
   };
 
   return (
-    <DrawerContentScrollView>
+    <DrawerContentScrollView style={styles.drawerWrapper}>
       {/* Profile Section */}
       <View style={styles.profileSection}>
-        <Text style={styles.profileText}>User Profile</Text>
-        {/* Add your profile information here */}
+        <View style={styles.profileImageWrapper}>
+          <FontAwesome5 name="user" size={50} color={colors.textDark} />
+        </View>
+        <View style={styles.profileTextWrapper}>
+          <Text style={styles.profileText}>User Profile</Text>
+        </View>
+        <TouchableOpacity style={styles.drawerClose} onPress={closeDrawer} >
+          <Ionicons name="close" size={24} color={colors.textLight} />
+        </TouchableOpacity>
       </View>
 
       {/* Drawer Items */}
-      <DrawerItemList state={state} navigation={navigation} descriptors={descriptors} />
+      <DrawerItemList 
+        state={state} 
+        navigation={navigation} 
+        descriptors={descriptors} 
+      />
 
-      {/* Close Drawer Button */}
-      <DrawerItem label="Close" onPress={closeDrawer} />
+      {/* Other Drawer Buttons */}
+      <DrawerItem label="Terms & Conditions" labelStyle={styles.drawerItem} />
+      <DrawerItem label="About Us" labelStyle={styles.drawerItem} />
+      <DrawerItem label="Logout" labelStyle={styles.drawerItem} />
     </DrawerContentScrollView>
   );
 };
@@ -47,6 +62,10 @@ const HomeNav = () => {
     <Drawer.Navigator
       initialRouteName="Product List"
       drawerContent={(props) => <CustomDrawerContent {...props} />}
+      screenOptions={{
+        drawerActiveTintColor: colors.secondary,
+        drawerInactiveTintColor: colors.white,
+      }}
     >
       <Drawer.Screen
         name="Products List"
@@ -56,7 +75,16 @@ const HomeNav = () => {
       <Drawer.Screen
         name="Create Product"
         component={AddProductScreen}
-        options={{ headerShown: true }}
+        options={{
+          headerStyle: {
+            backgroundColor: colors.bgDark,
+          },
+          headerTitleStyle: {
+            color: colors.textLight,
+          },
+          headerTintColor: colors.secondary,
+          headerShown: true,
+        }}
       />
       <Drawer.Screen
         name="My Products"
@@ -70,5 +98,39 @@ const HomeNav = () => {
 export default HomeNav;
 
 const styles = StyleSheet.create({
-
+  drawerWrapper:{
+    backgroundColor: colors.bgDark,
+    color: colors.white,
+  },
+  profileSection:{
+    flex: 1,
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: colors.gray,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    margin: 10,
+  },
+  profileImageWrapper:{
+    backgroundColor: colors.secondary,
+    padding: 25,
+    borderRadius: 50,
+    margin: 10,
+  },
+  profileTextWrapper:{
+    marginBottom: 5,
+  },
+  profileText:{
+    fontWeight: 'bold',
+    fontSize: 18,
+    color: colors.white,
+  },
+  drawerClose:{
+    position: 'absolute',
+    top: 0,
+    right: 0,
+  },
+  drawerItem:{
+    color: colors.white,
+  },
 })

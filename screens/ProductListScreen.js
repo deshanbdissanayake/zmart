@@ -147,11 +147,7 @@ const ProductListScreen = ({ route }) => {
               onPress={handleCancelBtnClick}
             >
               {/*<Text style={styles.bottomButtonText}>Cancel</Text>*/}
-              <MaterialCommunityIcons
-                name="cancel"
-                size={24}
-                color={colors.red}
-              />
+              <Ionicons name="close" size={24} color={colors.red} />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.bottomButtonStyles}
