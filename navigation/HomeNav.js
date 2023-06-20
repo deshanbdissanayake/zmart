@@ -1,78 +1,74 @@
-import React, {useEffect} from 'react';
-import { createStackNavigator } from '@react-navigation/stack';
-import { NavigationContainer } from '@react-navigation/native';
-import { Keyboard } from 'react-native';
+import * as React from 'react';
+import {
+  createDrawerNavigator,
+  DrawerContentScrollView,
+  DrawerItemList,
+  DrawerItem,
+} from '@react-navigation/drawer';
+import {
+  View,
+  Text,
+  StyleSheet,
+} from 'react-native';
+
 
 // Import your screens or components
+import ProListNav from './ProListNav';
+import MyProListNav from './MyProListNav';
 import AddProductScreen from '../screens/AddProductScreen';
-import ProductListScreen from '../screens/ProductListScreen';
-import SingleProductScreen from '../screens/SingleProductScreen';
-import SelectedProductsListScreen from '../screens/SelectedProductsListScreen';
 
-import { log_data } from '../assets/data/system';
-import colors from '../assets/colors/colors';
+const Drawer = createDrawerNavigator();
 
-// Create a stack navigator
-const Stack = createStackNavigator();
-
-function HomeNav() {
-
-  //================================================================
-  // unfocus from text inputs when keyboard hides
-  //================================================================
-  useEffect(() => {
-    const keyboardDidHideListener = Keyboard.addListener(
-      'keyboardDidHide',
-      () => {
-        // This will blur the currently focused input field
-        Keyboard.dismiss();
-      }
-      );
-
-      return () => {
-        keyboardDidHideListener.remove();
-      };
-    }, []);
-  //================================================================
+// Custom drawer content component
+const CustomDrawerContent = ({ navigation, state, descriptors }) => {
+  const closeDrawer = () => {
+    navigation.closeDrawer();
+  };
 
   return (
-      <Stack.Navigator>
-      {/*<Stack.Screen
-          name="Add Product"
-          component={AddProductScreen}
-          options={{ headerShown: false }}
-      />*/}
-      <Stack.Screen
-          name="Product List"
-          component={ProductListScreen}
-          options={{ headerShown: false }}
-          initialParams={{ propsData: { type : 'productList'} }} 
-      />
-      {/*<Stack.Screen
-          name="My Products"
-          component={ProductListScreen}
-          options={{ headerShown: false }}
-          initialParams={{ propsData: { type : 'myProducts'} }}
-      />*/}
-      <Stack.Screen
-        name="Single Product"
-        component={SingleProductScreen}
-        options={{
-            headerTitle : 'Single Product',
-            headerStyle: {
-                backgroundColor: colors.bgDark,
-            },
-            headerTintColor: colors.white,
-            headerShown: true
-        }}
-      />
-      {/*<Stack.Screen
-          name="Selected Product"
-          component={SelectedProductsListScreen}
-          options={{ headerShown: false }}
-      />*/}
-      </Stack.Navigator>
+    <DrawerContentScrollView>
+      {/* Profile Section */}
+      <View style={styles.profileSection}>
+        <Text style={styles.profileText}>User Profile</Text>
+        {/* Add your profile information here */}
+      </View>
+
+      {/* Drawer Items */}
+      <DrawerItemList state={state} navigation={navigation} descriptors={descriptors} />
+
+      {/* Close Drawer Button */}
+      <DrawerItem label="Close" onPress={closeDrawer} />
+    </DrawerContentScrollView>
   );
-}
+};
+
+const HomeNav = () => {
+  return (
+    <Drawer.Navigator
+      initialRouteName="Product List"
+      drawerContent={(props) => <CustomDrawerContent {...props} />}
+    >
+      <Drawer.Screen
+        name="Products List"
+        component={ProListNav}
+        options={{ headerShown: false }}
+      />
+      <Drawer.Screen
+        name="Create Product"
+        component={AddProductScreen}
+        options={{ headerShown: true }}
+      />
+      <Drawer.Screen
+        name="My Products"
+        component={MyProListNav}
+        options={{ headerShown: false }}
+      />
+    </Drawer.Navigator>
+  );
+};
 
 export default HomeNav;
+
+const styles = StyleSheet.create({
+
+})

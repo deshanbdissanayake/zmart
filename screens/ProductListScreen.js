@@ -106,7 +106,7 @@ const ProductListScreen = ({ route }) => {
 
   const renderProductList = () => (
     <View style={styles.content}>
-      <Header />
+      {/*<Header />*/}
       <View style={styles.searchWrapper}>
         <TextInput
           style={styles.searchText}
@@ -222,7 +222,11 @@ const ProductListScreen = ({ route }) => {
             </TouchableOpacity>
           </View>
         )
-      ) : null}
+      ) : 
+        <Footer/>
+      }
+
+      
     </View>
   );
 
@@ -248,7 +252,8 @@ const styles = StyleSheet.create({
   },
   searchWrapper: {
     width: '100%',
-    paddingVertical: 10,
+    paddingBottom: 10,
+    paddingTop: 20,
     paddingHorizontal: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -265,7 +270,7 @@ const styles = StyleSheet.create({
   searchIcon: {
     position: 'absolute',
     right: 30,
-    top: 15,
+    top: 27,
   },
   proListWrapper: {
     flex: 1,

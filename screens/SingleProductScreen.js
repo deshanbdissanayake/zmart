@@ -11,7 +11,6 @@ import {
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from 'react-native-vector-icons';
 import colors from '../assets/colors/colors';
-import Header from '../components/header/Header';
 import { getProductByProId } from '../assets/data/product';
 
 const SingleProductScreen = () => {
@@ -59,7 +58,6 @@ const SingleProductScreen = () => {
 
     return (
       <View style={styles.content}>
-        {/*<Header />*/}
         <ScrollView showsVerticalScrollIndicator={false}>
           <Text style={statusStyles}>{status}</Text>
           <View style={styles.topWrapper}>

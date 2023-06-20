@@ -3,14 +3,8 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { Keyboard } from 'react-native';
 
-// Import your screens or components
-import RegistrationScreen from './screens/RegistrationScreen';
-
-import { log_data } from './assets/data/system';
-
 // Screens and Navigators
 import SplashScreen from './screens/SplashScreen';
-import HomeNav from './navigation/HomeNav';
 import MainNav from './navigation/MainNav';
 
 

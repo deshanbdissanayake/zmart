@@ -5,12 +5,9 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  ScrollView,
   ActivityIndicator,
-  KeyboardAvoidingView, // Import KeyboardAvoidingView
-  Platform,
 } from 'react-native';
-import { Ionicons } from 'react-native-vector-icons';
+import { Ionicons, Entypo } from 'react-native-vector-icons'; 
 import colors from '../assets/colors/colors';
 
 import { addProduct } from '../assets/data/product';
@@ -29,14 +26,7 @@ const AddProductScreen = () => {
     const [proNameError, setProNameError] = useState(false);
 
     //other
-    const [formType, setFormType] = useState('add'); // add or update
     const [buttonLoading, setButtonLoading] = useState(false);
-
-    //=========================================================================
-
-    const registrationTitle = formType === 'add' ? 'Create Product' : 'Edit Product';
-    const buttonText = formType === 'add' ? 'Create' : 'Edit';
-    const registrationDesc = 'In publishing and graphic design, Lorem ipsum is a placeholder text commonly used.';
 
     //=========================================================================
     
@@ -65,22 +55,10 @@ const AddProductScreen = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.headerWrapper}>
-        <TouchableOpacity>
-          <Ionicons name="arrow-back" size={24} color="black" />
-        </TouchableOpacity>
-        <View style={styles.registrationWrapper}>
-          <Text style={styles.registrationTitle}>{registrationTitle}</Text>
-          <Text style={styles.registrationDescription}>
-            {registrationDesc}
-          </Text>
-        </View>
-      </View>
-
       <View style={styles.formWrapper}>
-          <ScrollView
+          <View
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.scrollContainer}
+            style={styles.scrollContainer}
             keyboardShouldPersistTaps="handled">
 
             <View style={styles.formGroup}>
@@ -149,25 +127,27 @@ const AddProductScreen = () => {
                   editable={true}
                 />
               </View>
-            </View>      
+            </View>     
 
-            <View style={styles.formGroup}>
+            <View style={styles.bottomButtonsWrapper}>
               {buttonLoading ? (
-                <View style={[styles.buttonStyle, styles.buttonLoading]}>
+                <View style={styles.bottomButtonStyles}>
                   <ActivityIndicator color={colors.white} />
                 </View>
               ) : (
-                <TouchableOpacity
-                  style={styles.buttonStyle}
-                  onPress={handleButtonClick}>
-                  <Text style={styles.buttonText}>
-                  {buttonText}
-                  </Text>
-                </TouchableOpacity>
+                <>
+                  <TouchableOpacity style={styles.bottomButtonStyles}>
+                    <Ionicons name="arrow-undo" size={24} color={colors.secondary} />
+                  </TouchableOpacity>
+                    
+                  <TouchableOpacity style={styles.bottomButtonStyles} onPress={handleButtonClick}>
+                    <Entypo name="circle-with-plus" size={24} color={colors.secondary} />
+                  </TouchableOpacity>
+                </>
               )}
             </View>
 
-            </ScrollView>
+            </View>
         </View>        
     </View>
   );
@@ -176,38 +156,18 @@ const AddProductScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: colors.secondary,
-      },
-      headerWrapper: {
-        flex: 2,
-        paddingHorizontal: 20,
-        paddingTop: 40,
-      },
-      registrationWrapper: {
-        marginTop: 30,
-      },
-      registrationTitle: {
-        color: colors.textDark,
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 10,
-      },
-      registrationDescription: {
-        marginBottom: 20,
       },
       formWrapper: {
-        flex: 4,
+        flex: 1,
         backgroundColor: colors.bgLight,
-        borderTopRightRadius: 30,
-        borderTopLeftRadius: 30,
         justifyContent: 'center',
         alignItems: 'center',
-        paddingHorizontal: 30,
+        paddingHorizontal: 20,
         paddingVertical: 20,
       },
       scrollContainer: {
-        flexGrow: 1,
-        justifyContent: 'center',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
       },
       formGroup: {
         flexDirection: 'column',
@@ -228,21 +188,23 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         borderRadius: 10,
       },
-      buttonStyle: {
-        width: '100%',
-        padding: 10,
-        borderRadius: 10,
+      
+      //=========================================================
+
+      bottomButtonsWrapper: {
+        flexDirection: 'row',
+        paddingVertical: 10,
+        backgroundColor: colors.bgDark,
+        borderTopRightRadius: 10,
+        borderTopLeftRadius: 10,
+      },
+      bottomButtonStyles: {
+        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: colors.textDark,
+        flexDirection: 'row',
       },
-      buttonLoading: {
-        backgroundColor: colors.gray,
-      },
-      buttonText: {
-        color: colors.white,
-      },
-    
+
       //=========================================================
 
       singleImage: {

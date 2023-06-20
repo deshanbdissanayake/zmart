@@ -1,19 +1,29 @@
 import React from 'react';
-import { Text, View, Image, StyleSheet, StatusBar } from 'react-native';
+import { Text, View, Image, StyleSheet, StatusBar, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { DrawerActions } from '@react-navigation/native';
 
 import { log_data } from '../../assets/data/system';
 import colors from '../../assets/colors/colors'; 
 
-
 const Header = () => {
+  const navigation = useNavigation();
+
+  const openDrawer = () => {
+    //console.log('drawer')
+    navigation.dispatch(DrawerActions.openDrawer());
+  };
+
   return (
     <View>
       <StatusBar backgroundColor={colors.bgDark} barStyle="light-content" />
       <View style={styles.headerContainer}>
         <View style={styles.leftContainer}>
           {/* Hamburger menu */}
-          <Ionicons name="menu" size={24} color={colors.textLight} />
+          <TouchableOpacity onPress={openDrawer}>
+            <Ionicons name="menu" size={24} color={colors.textLight} />
+          </TouchableOpacity>
         </View>
         <View style={styles.centerContainer}>
           {/* Logo */}
@@ -46,7 +56,7 @@ const styles = StyleSheet.create({
   centerContainer: {
     flex: 2,
     alignItems: 'center',
-    flexDirection : 'row',
+    flexDirection: 'row',
   },
   logo: {
     width: 30,
