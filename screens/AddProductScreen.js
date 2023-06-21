@@ -17,7 +17,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { addProduct } from '../assets/data/product';
 
 const AddProductScreen = () => {
-  const [formData, setFormData] = useState({
+  const [productData, setProductData] = useState({
     proId: '',
     proName: '',
     proDesc: '',
@@ -28,7 +28,7 @@ const AddProductScreen = () => {
     image3: '',
   });
 
-  const { proName, proDesc, proPrice, proQty, image1, image2, image3 } = formData;
+  const { proId, proName, proDesc, proPrice, proQty, image1, image2, image3 } = productData;
 
   const [formErrors, setFormErrors] = useState({
     proNameError: false,
@@ -64,7 +64,7 @@ const AddProductScreen = () => {
   };
 
   const handleInputChange = (key, value) => {
-    setFormData((prevFormData) => ({
+    setProductData((prevFormData) => ({
       ...prevFormData,
       [key]: value,
     }));
@@ -106,13 +106,39 @@ const AddProductScreen = () => {
     if (Object.keys(errors).length === 0) {
       setLoading(true);
       console.log('Button pressed');
-      // Add your logic here for adding/updating the product
+      
+      
+      // Create a new form data object
+      const formData = new FormData();
 
-      addProduct(formData) // Call addProduct with the formData
-      .then(() => {
-        Alert.alert('Success', 'Product added/updated successfully!', [
+      // Append the image data to the form data object
+      formData.append('image1', {
+        uri: image1,
+        name: 'image.jpg',
+        type: 'image/jpeg',
+      });
+      formData.append('image2', {
+        uri: image2,
+        name: 'image.jpg',
+        type: 'image/jpeg',
+      });
+      formData.append('image3', {
+        uri: image3,
+        name: 'image.jpg',
+        type: 'image/jpeg',
+      });
+      formData.append('proId', proId);
+      formData.append('proName', proName);
+      formData.append('proDes', proDesc);
+      formData.append('proPrice', proPrice);
+      formData.append('proQty', proQty);
+
+      addProduct(formData) // Call addProduct with the productData
+      .then((response) => {
+        console.log(response)
+        {/*Alert.alert('Success', 'Product added/updated successfully!', [
           { text: 'OK', onPress: () => console.log('OK Pressed') },
-        ]);
+        ]); */}
       })
       .catch((error) => {
         Alert.alert('Error', 'Failed to add/update product.');
@@ -124,7 +150,7 @@ const AddProductScreen = () => {
   };
 
   const handleReset = () => {
-    setFormData({
+    setProductData({
       proId: '',
       proName: '',
       proDesc: '',
@@ -147,7 +173,7 @@ const AddProductScreen = () => {
   }
 
   const ImageButton = ({ imageNumber }) => {
-    const imageSource = formData[`image${imageNumber}`];
+    const imageSource = productData[`image${imageNumber}`];
   
     return (
       <TouchableOpacity onPress={() => handleImageSelect(imageNumber)}>

@@ -1,5 +1,26 @@
 const addProduct = async (formData, userToken = '1', userPhone = '714124766', userType = 'supplier') => {
-  return true;
+  const url = 'https://v2.genzo.lk/App_api/saveProducts';
+
+  const headers = new Headers({
+    'Content-Type': 'multipart/form-data',
+    userToken: userToken,
+    userPhone: userPhone,
+    userType: userType,
+  });
+
+  const options = {
+    method: 'POST',
+    headers: headers,
+    body: formData,
+  };
+
+  try {
+    const response = await fetch(url, options);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    throw new Error('Failed to add/update product.');
+  }
 };
 
 

@@ -8,19 +8,18 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from 'react-native-vector-icons';
 import colors from '../assets/colors/colors';
 
 import { sendOtp, verifyNumber, saveUser } from '../assets/data/user';
+import { log_data } from '../assets/data/system'; //getting dummy data
 
 const RegistrationScreen = () => {
-  {
-    /* ========================================================================================= */
-  }
-  {
-    /* form states */
-  }
+  //========================================================================================= 
+  //form states
   const [phoneNumber, setPhoneNumber] = useState('');
   const [otp, setOtp] = useState('');
 
@@ -29,9 +28,8 @@ const RegistrationScreen = () => {
   const [address, setAddress] = useState('');
   const [nic, setNic] = useState('');
   const [shopName, setShopName] = useState('');
-  {
-    /* errors */
-  }
+  
+  //errors
   const [phoneNumberError, setPhoneNumberError] = useState(false);
   const [otpError, setOtpError] = useState(false);
 
@@ -41,22 +39,18 @@ const RegistrationScreen = () => {
   const [nicError, setNicError] = useState(false);
   const [shopNameError, setShopNameError] = useState(false);
 
-  {
-    /* other states */
-  }
+  //other states
   const [buttonLoading, setButtonLoading] = useState(false); //button get disabled while loading
   const [otpSent, setOtpSent] = useState(false);
   const [showResend, setShowResend] = useState(false);
   const [phoneNumberVerified, setPhoneNumberVerified] = useState(false);
 
+  const [logData, setLogData] = useState(log_data);
+
   const navigation = useNavigation();
 
-  {
-    /* ========================================================================================= */
-  }
-  {
-    /* handle button click */
-  }
+  //=========================================================================================
+  // handle button click
   const handleButtonClick = () => {
     // Handle registration logic here
     console.log(' button pressed');
@@ -148,13 +142,12 @@ const RegistrationScreen = () => {
     }
   };
 
-  {
-    /* send otp function */
-  }
+  //send otp function
   const sendOtpFunc = () => {
+    console.log('otp send')
     sendOtp(phoneNumber)
       .then((otpStatus) => {
-        if (otpStatus) {
+        if (otpStatus.stt == 'ok') {
           setOtpSent(true);
           setTimeout(() => {
             setShowResend(true);
@@ -172,13 +165,21 @@ const RegistrationScreen = () => {
       });
   };
 
-  {
-    /* confirm otp and verify number */
-  }
+  //confirm otp and verify number
   const verifyNumberFunc = () => {
     verifyNumber(phoneNumber, otp)
-      .then((verifyStatus) => {
-        if (verifyStatus) {
+      .then((verifyData) => {
+        if (verifyData.stt == 'ok') {
+
+          //=================================================
+          //update log data
+          //=================================================
+          setLogData(prevLogData => ({
+            ...prevLogData,
+            log_userToken: verifyData.payload.token
+          }));          
+          //=================================================
+          
           setPhoneNumberVerified(true);
         } else {
           setOtpError(true);
@@ -193,37 +194,51 @@ const RegistrationScreen = () => {
       });
   };
 
-  {
-    /* save user */
-  }
-  const saveUserFunc = () => {
-    let formData = {
-      phoneNumber: phoneNumber,
-      whatsapp: whatsapp,
-      name: name,
-      address: address,
-      nic: nic,
-      shopName: shopName,
-    };
-
-    saveUser(formData)
-      .then((verifyStatus) => {
-        if (verifyStatus) {
-          console.log('user saved');
+  //save user
+  const saveUserFunc = async () => {
+    clearAsyncStorage(); // Clear async storage
+  
+    const formData = new FormData();
+  
+    formData.append('address', address);
+    formData.append('nic', nic);
+    formData.append('shopname', shopName);
+    formData.append('supname', name);
+    formData.append('wapp_no', whatsapp);
+    formData.append('user_phone', phoneNumber);
+  
+    try {
+      const verifyStatus = await saveUser(formData);
+      if (verifyStatus.stt === 'ok') {
+        console.log('User saved');
+  
+        // Update log data
+        setLogData((prevLogData) => ({
+          ...prevLogData,
+          log_status: true,
+          log_userNumber: phoneNumber,
+          log_userName: name,
+          log_userShop: shopName,
+          log_userWhsp: whatsapp,
+          log_userAddress: address,
+        }));
+  
+        // this await doesn't work yet.
+        await saveAsyncStorage(); // Call saveAsyncStorage and wait for it to complete
+        if(logData.log_status){ //check here
+          navigation.navigate('Home');
+        }else{
           navigation.navigate('Home');
         }
-      })
-      .catch((error) => {
-        console.error('Verification error:', error);
-      })
-      .finally(() => {
-        setButtonLoading(false); // Disable loading state
-      });
+      }
+    } catch (error) {
+      console.error('Verification error:', error);
+    } finally {
+      setButtonLoading(false); // Disable loading state
+    }
   };
 
-  {
-    /* resend button click */
-  }
+  //resend button click
   const resendButtonClick = () => {
     setOtp('');
     setShowResend(false);
@@ -237,9 +252,33 @@ const RegistrationScreen = () => {
     setPhoneNumberVerified(false);
   };
 
-  {
-    /* ========================================================================================= */
-  }
+  //=========================================================================================
+
+  // Save log_data to AsyncStorage
+  const saveAsyncStorage = async () => {
+    try {
+      const logDataString = JSON.stringify(logData);
+      console.log('Save async:', logDataString);
+  
+      await AsyncStorage.setItem('log_data', logDataString);
+      console.log('log_data saved to AsyncStorage');
+    } catch (error) {
+      console.error('Error saving log_data to AsyncStorage:', error);
+    }
+  };
+
+  // Function to clear AsyncStorage
+  const clearAsyncStorage = async () => {
+    try {
+      await AsyncStorage.clear();
+      console.log('AsyncStorage cleared successfully.');
+    } catch (error) {
+      console.error('Error clearing AsyncStorage:', error);
+      // Handle the error appropriately
+    }
+  };
+
+  //=========================================================================================
 
   return (
     <View style={styles.container}>
