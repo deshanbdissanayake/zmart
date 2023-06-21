@@ -8,10 +8,13 @@ import {
   ActivityIndicator,
   ScrollView,
   Image,
+  Alert
 } from 'react-native';
 import { MaterialCommunityIcons, Entypo, Ionicons } from 'react-native-vector-icons';
 import colors from '../assets/colors/colors';
 import * as ImagePicker from 'expo-image-picker';
+
+import { addProduct } from '../assets/data/product';
 
 const AddProductScreen = () => {
   const [formData, setFormData] = useState({
@@ -37,7 +40,7 @@ const AddProductScreen = () => {
     image3Error: false,
   });
 
-  const [buttonLoading, setButtonLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleImageSelect = async (imageNumber) => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -101,8 +104,22 @@ const AddProductScreen = () => {
     setFormErrors(errors);
 
     if (Object.keys(errors).length === 0) {
+      setLoading(true);
       console.log('Button pressed');
       // Add your logic here for adding/updating the product
+
+      addProduct(formData) // Call addProduct with the formData
+      .then(() => {
+        Alert.alert('Success', 'Product added/updated successfully!', [
+          { text: 'OK', onPress: () => console.log('OK Pressed') },
+        ]);
+      })
+      .catch((error) => {
+        Alert.alert('Error', 'Failed to add/update product.');
+      })
+      .finally(() => {
+        setLoading(false);
+      });
     }
   };
 
@@ -126,7 +143,7 @@ const AddProductScreen = () => {
       image2Error: false,
       image3Error: false,
     })
-    setButtonLoading(false)
+    setLoading(false)
   }
 
   const ImageButton = ({ imageNumber }) => {
@@ -148,113 +165,113 @@ const AddProductScreen = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.formWrapper}>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollContainer}
-          keyboardShouldPersistTaps="handled"
-        >
-          <View style={styles.formGroup}>
-            <View style={styles.formContainer}>
-              <TextInput
-                style={[styles.input, { width: '100%' }]}
-                placeholder="Enter Product Name"
-                value={proName}
-                onChangeText={(text) => handleInputChange('proName', text)}
-                keyboardType="default"
-                editable={true}
-              />
-            </View>
-
-            {formErrors.proNameError && (
-              <View style={styles.errorWrapper}>
-                <Text style={styles.errorMessage}>Product Name is required!</Text>
-              </View>
-            )}
-          </View>
-
-          <View style={styles.formGroup}>
-            <View style={styles.formContainer}>
-              <ImageButton imageNumber={1} />
-              <ImageButton imageNumber={2} />
-              <ImageButton imageNumber={3} />
-            </View>
-
-            {(formErrors.image1Error || formErrors.image2Error || formErrors.image3Error) && (
-              <View style={styles.errorWrapper}>
-                <Text style={styles.errorMessage}>Please upload all three images!</Text>
-              </View>
-            )}
-          </View>
-
-          <View style={styles.formGroup}>
-            <View style={styles.formContainer}>
-              <TextInput
-                style={styles.textarea}
-                placeholder="Enter Product Description (250 characters max)"
-                value={proDesc}
-                onChangeText={(text) => handleInputChange('proDesc', text)}
-                keyboardType="default"
-                multiline={true}
-                editable={true}
-                numberOfLines={4}
-                maxLength={250}
-              />
-            </View>
-
-            {formErrors.proDescError && (
-              <View style={styles.errorWrapper}>
-                <Text style={styles.errorMessage}>Product Description is required!</Text>
-              </View>
-            )}
-          </View>
-
-          <View style={styles.formGroup}>
-            <View style={styles.formContainer}>
-              <TextInput
-                style={styles.input}
-                placeholder="Enter Product Price"
-                value={proPrice}
-                onChangeText={(text) => handleInputChange('proPrice', text)}
-                keyboardType="numeric"
-                editable={true}
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Enter Product Qty"
-                value={proQty}
-                onChangeText={(text) => handleInputChange('proQty', text)}
-                keyboardType="numeric"
-                editable={true}
-              />
-            </View>
-
-            {(formErrors.proPriceError || formErrors.proQtyError) && (
-              <View style={styles.errorWrapper}>
-                <Text style={styles.errorMessage}>Product Price & Qty field is required!</Text>
-              </View>
-            )}
-          </View>
-        </ScrollView>
-      </View>
-
-      <View style={styles.bottomButtonsWrapper}>
-        {buttonLoading ? (
-          <View style={styles.bottomButtonStyles}>
-            <ActivityIndicator color={colors.white} />
+      {loading ? (
+          <View style={styles.activityIndicatorWrapper}>
+            <ActivityIndicator color={colors.textDark} />
           </View>
         ) : (
           <>
-            <TouchableOpacity style={styles.bottomButtonStyles} onPress={handleReset}>
-              <MaterialCommunityIcons name="cancel" size={24} color={colors.red} />
-            </TouchableOpacity>
+            <View style={styles.formWrapper}>
+              <ScrollView
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.scrollContainer}
+                keyboardShouldPersistTaps="handled"
+              >
+                <View style={styles.formGroup}>
+                  <View style={styles.formContainer}>
+                    <TextInput
+                      style={[styles.input, { width: '100%' }]}
+                      placeholder="Enter Product Name"
+                      value={proName}
+                      onChangeText={(text) => handleInputChange('proName', text)}
+                      keyboardType="default"
+                      editable={true}
+                    />
+                  </View>
 
-            <TouchableOpacity style={styles.bottomButtonStyles} onPress={handleButtonClick}>
-              <Entypo name="circle-with-plus" size={24} color={colors.secondary} />
-            </TouchableOpacity>
+                  {formErrors.proNameError && (
+                    <View style={styles.errorWrapper}>
+                      <Text style={styles.errorMessage}>Product Name is required!</Text>
+                    </View>
+                  )}
+                </View>
+
+                <View style={styles.formGroup}>
+                  <View style={styles.formContainer}>
+                    <ImageButton imageNumber={1} />
+                    <ImageButton imageNumber={2} />
+                    <ImageButton imageNumber={3} />
+                  </View>
+
+                  {(formErrors.image1Error || formErrors.image2Error || formErrors.image3Error) && (
+                    <View style={styles.errorWrapper}>
+                      <Text style={styles.errorMessage}>Please upload all three images!</Text>
+                    </View>
+                  )}
+                </View>
+
+                <View style={styles.formGroup}>
+                  <View style={styles.formContainer}>
+                    <TextInput
+                      style={styles.textarea}
+                      placeholder="Enter Product Description (250 characters max)"
+                      value={proDesc}
+                      onChangeText={(text) => handleInputChange('proDesc', text)}
+                      keyboardType="default"
+                      multiline={true}
+                      editable={true}
+                      numberOfLines={4}
+                      maxLength={250}
+                    />
+                  </View>
+
+                  {formErrors.proDescError && (
+                    <View style={styles.errorWrapper}>
+                      <Text style={styles.errorMessage}>Product Description is required!</Text>
+                    </View>
+                  )}
+                </View>
+
+                <View style={styles.formGroup}>
+                  <View style={styles.formContainer}>
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Enter Product Price"
+                      value={proPrice}
+                      onChangeText={(text) => handleInputChange('proPrice', text)}
+                      keyboardType="numeric"
+                      editable={true}
+                    />
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Enter Product Qty"
+                      value={proQty}
+                      onChangeText={(text) => handleInputChange('proQty', text)}
+                      keyboardType="numeric"
+                      editable={true}
+                    />
+                  </View>
+
+                  {(formErrors.proPriceError || formErrors.proQtyError) && (
+                    <View style={styles.errorWrapper}>
+                      <Text style={styles.errorMessage}>Product Price & Qty field is required!</Text>
+                    </View>
+                  )}
+                </View>
+              </ScrollView>
+            </View>
+
+            <View style={styles.bottomButtonsWrapper}>
+              <TouchableOpacity style={styles.bottomButtonStyles} onPress={handleReset}>
+                <MaterialCommunityIcons name="cancel" size={24} color={colors.red} />
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.bottomButtonStyles} onPress={handleButtonClick}>
+                <Entypo name="circle-with-plus" size={24} color={colors.secondary} />
+              </TouchableOpacity>
+            </View>
           </>
         )}
-      </View>
     </View>
   );
 };
@@ -340,7 +357,11 @@ const styles = StyleSheet.create({
     fontSize: 11,
     textAlign: 'right',
   },
-
+  activityIndicatorWrapper:{
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
 
 export default AddProductScreen;
