@@ -7,240 +7,340 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   ScrollView,
+  Image,
 } from 'react-native';
-import { MaterialCommunityIcons, Entypo, Ionicons } from 'react-native-vector-icons'; 
+import { MaterialCommunityIcons, Entypo, Ionicons } from 'react-native-vector-icons';
 import colors from '../assets/colors/colors';
-
-import { addProduct } from '../assets/data/product';
+import * as ImagePicker from 'expo-image-picker';
 
 const AddProductScreen = () => {
+  const [formData, setFormData] = useState({
+    proId: '',
+    proName: '',
+    proDesc: '',
+    proPrice: '',
+    proQty: '',
+    image1: '',
+    image2: '',
+    image3: '',
+  });
 
-    //=========================================================================
+  const { proName, proDesc, proPrice, proQty, image1, image2, image3 } = formData;
 
-    //main
-    const [proName, setProName] = useState('');
-    const [proDesc, setProDesc] = useState('');
-    const [proPrice, setProPrice] = useState('');
-    const [proQty, setProQty] = useState('');
+  const [formErrors, setFormErrors] = useState({
+    proNameError: false,
+    proDescError: false,
+    proPriceError: false,
+    proQtyError: false,
+    image1Error: false,
+    image2Error: false,
+    image3Error: false,
+  });
 
-    //errors
-    const [proNameError, setProNameError] = useState(false);
+  const [buttonLoading, setButtonLoading] = useState(false);
 
-    //other
-    const [buttonLoading, setButtonLoading] = useState(false);
+  const handleImageSelect = async (imageNumber) => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-    //=========================================================================
-    
-    const handleButtonClick = () => {
-        // Handle product add/update logic here
-        console.log(' button pressed');
+    if (status !== 'granted') {
+      alert('Permission to access media library is required!');
+      return;
     }
 
-    //=========================================================================
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
 
-    const ImageButton = () => {
-        return (
-        <TouchableOpacity>
-            <View style={[styles.singleImage, styles.shadowStyle]}>
-                <Ionicons
-                name="add"
-                size={48}
-                color={colors.textDark} 
-                />
-            </View>
-        </TouchableOpacity>
-        );
-    };
+    if (!result.canceled) {
+      const key = `image${imageNumber}`;
+      handleInputChange(key, result.assets[0].uri);
+    }
+  };
 
-    //=========================================================================
+  const handleInputChange = (key, value) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [key]: value,
+    }));
+  };
+
+  const handleButtonClick = () => {
+    const errors = {};
+
+    if (proName.trim() === '') {
+      errors.proNameError = true;
+    }
+
+    if (proDesc.trim() === '') {
+      errors.proDescError = true;
+    }
+
+    if (proPrice.trim() === '') {
+      errors.proPriceError = true;
+    }
+
+    if (proQty.trim() === '') {
+      errors.proQtyError = true;
+    }
+
+    if (image1 === '') {
+      errors.image1Error = true;
+    }
+
+    if (image2 === '') {
+      errors.image2Error = true;
+    }
+
+    if (image3 === '') {
+      errors.image3Error = true; 
+    }
+
+    setFormErrors(errors);
+
+    if (Object.keys(errors).length === 0) {
+      console.log('Button pressed');
+      // Add your logic here for adding/updating the product
+    }
+  };
+
+  const handleReset = () => {
+    setFormData({
+      proId: '',
+      proName: '',
+      proDesc: '',
+      proPrice: '',
+      proQty: '',
+      image1: '',
+      image2: '',
+      image3: '',
+    })
+    setFormErrors({
+      proNameError: false,
+      proDescError: false,
+      proPriceError: false,
+      proQtyError: false,
+      image1Error: false,
+      image2Error: false,
+      image3Error: false,
+    })
+    setButtonLoading(false)
+  }
+
+  const ImageButton = ({ imageNumber }) => {
+    const imageSource = formData[`image${imageNumber}`];
+  
+    return (
+      <TouchableOpacity onPress={() => handleImageSelect(imageNumber)}>
+        <View style={[styles.singleImage, styles.shadowStyle]}>
+          {imageSource ? (
+            <Image source={{ uri: imageSource }} style={styles.selectedImage} />
+          ) : (
+            <Ionicons name="add" size={48} color={colors.textDark} />
+          )}
+        </View>
+      </TouchableOpacity>
+    );
+  };
+  
 
   return (
     <View style={styles.container}>
-
-        <View style={styles.formWrapper}>
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.scrollContainer}
-            keyboardShouldPersistTaps="handled"
-          >
-            <View style={styles.formGroup}>
-              <View style={styles.formContainer}>
-                <TextInput
-                  style={[styles.input, {width: '100%'}]}
-                  placeholder="Enter Product Name"
-                  value={proName}
-                  onChangeText={setProName}
-                  keyboardType="default"
-                  editable={true}
-                />
-              </View>
-
-              {proNameError ? (
-                <View style={styles.errorWrapper}>
-                  <Text style={styles.errorMessage}>
-                    This field is required!
-                  </Text>
-                </View>
-              ) : (
-                ''
-              )}
-            </View>      
-
-            <View style={styles.formGroup}>
-              <View style={styles.formContainer}>
-                <ImageButton />
-                <ImageButton />
-                <ImageButton />
-              </View>
-            </View>  
-
-            <View style={styles.formGroup}>
-              <View style={styles.formContainer}>
-                <TextInput
-                    style={styles.textarea}
-                    placeholder="Enter Product Description (250 characters max)"
-                    value={proDesc}
-                    onChangeText={setProDesc}
-                    keyboardType="default"
-                    multiline={true}
-                    editable={true}
-                    numberOfLines={4}
-                    maxLength={250}
-                    />
-              </View>
-            </View>    
-
-            <View style={styles.formGroup}>
-              <View style={styles.formContainer}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Enter Product Price"
-                  value={proPrice}
-                  onChangeText={setProPrice}
-                  keyboardType="numeric"
-                  editable={true}
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Enter Product Qty"
-                  value={proQty}
-                  onChangeText={setProQty}
-                  keyboardType="numeric"
-                  editable={true}
-                />
-              </View>
-            </View>     
-          </ScrollView>
-        </View>
-
-        <View style={styles.bottomButtonsWrapper}>
-          {buttonLoading ? (
-            <View style={styles.bottomButtonStyles}>
-              <ActivityIndicator color={colors.white} />
+      <View style={styles.formWrapper}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContainer}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.formGroup}>
+            <View style={styles.formContainer}>
+              <TextInput
+                style={[styles.input, { width: '100%' }]}
+                placeholder="Enter Product Name"
+                value={proName}
+                onChangeText={(text) => handleInputChange('proName', text)}
+                keyboardType="default"
+                editable={true}
+              />
             </View>
-          ) : (
-            <>
-              <TouchableOpacity style={styles.bottomButtonStyles}>
-                <MaterialCommunityIcons name="cancel" size={24} color={colors.red} />
-              </TouchableOpacity>
-                
-              <TouchableOpacity style={styles.bottomButtonStyles} onPress={handleButtonClick}>
-                <Entypo name="circle-with-plus" size={24} color={colors.secondary} />
-              </TouchableOpacity>
-            </>
-          )}
-        </View>    
 
+            {formErrors.proNameError && (
+              <View style={styles.errorWrapper}>
+                <Text style={styles.errorMessage}>Product Name is required!</Text>
+              </View>
+            )}
+          </View>
+
+          <View style={styles.formGroup}>
+            <View style={styles.formContainer}>
+              <ImageButton imageNumber={1} />
+              <ImageButton imageNumber={2} />
+              <ImageButton imageNumber={3} />
+            </View>
+
+            {(formErrors.image1Error || formErrors.image2Error || formErrors.image3Error) && (
+              <View style={styles.errorWrapper}>
+                <Text style={styles.errorMessage}>Please upload all three images!</Text>
+              </View>
+            )}
+          </View>
+
+          <View style={styles.formGroup}>
+            <View style={styles.formContainer}>
+              <TextInput
+                style={styles.textarea}
+                placeholder="Enter Product Description (250 characters max)"
+                value={proDesc}
+                onChangeText={(text) => handleInputChange('proDesc', text)}
+                keyboardType="default"
+                multiline={true}
+                editable={true}
+                numberOfLines={4}
+                maxLength={250}
+              />
+            </View>
+
+            {formErrors.proDescError && (
+              <View style={styles.errorWrapper}>
+                <Text style={styles.errorMessage}>Product Description is required!</Text>
+              </View>
+            )}
+          </View>
+
+          <View style={styles.formGroup}>
+            <View style={styles.formContainer}>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter Product Price"
+                value={proPrice}
+                onChangeText={(text) => handleInputChange('proPrice', text)}
+                keyboardType="numeric"
+                editable={true}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Enter Product Qty"
+                value={proQty}
+                onChangeText={(text) => handleInputChange('proQty', text)}
+                keyboardType="numeric"
+                editable={true}
+              />
+            </View>
+
+            {(formErrors.proPriceError || formErrors.proQtyError) && (
+              <View style={styles.errorWrapper}>
+                <Text style={styles.errorMessage}>Product Price & Qty field is required!</Text>
+              </View>
+            )}
+          </View>
+        </ScrollView>
+      </View>
+
+      <View style={styles.bottomButtonsWrapper}>
+        {buttonLoading ? (
+          <View style={styles.bottomButtonStyles}>
+            <ActivityIndicator color={colors.white} />
+          </View>
+        ) : (
+          <>
+            <TouchableOpacity style={styles.bottomButtonStyles} onPress={handleReset}>
+              <MaterialCommunityIcons name="cancel" size={24} color={colors.red} />
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.bottomButtonStyles} onPress={handleButtonClick}>
+              <Entypo name="circle-with-plus" size={24} color={colors.secondary} />
+            </TouchableOpacity>
+          </>
+        )}
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-      container: {
-        flex: 1,
-      },
-      formWrapper: {
-        flex: 1,
-        backgroundColor: colors.bgLight,
-      },
-      scrollContainer:{
-        flexGrow: 1,
-        justifyContent: 'space-around',
-        paddingHorizontal: 20,
-        paddingVertical: 20,
-      },
-      formGroup: {
-        flexDirection: 'column',
-        marginBottom: 10,
-      },
-      formContainer: {
-        width: '100%',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-      },
-      disabled: {
-        backgroundColor: colors.disabled,
-      },
-      input: {
-        height: 40,
-        borderColor: colors.border,
-        color: colors.textDark,
-        borderWidth: 1,
-        paddingHorizontal: 10,
-        borderRadius: 10,
-      },
-      
-      //=========================================================
+  container: {
+    flex: 1,
+  },
+  formWrapper: {
+    flex: 1,
+    backgroundColor: colors.bgLight,
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: 'space-around',
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+  },
+  formGroup: {
+    flexDirection: 'column',
+    marginBottom: 10,
+  },
+  formContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  disabled: {
+    backgroundColor: colors.disabled,
+  },
+  input: {
+    height: 40,
+    borderColor: colors.border,
+    color: colors.textDark,
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+  },
+  bottomButtonsWrapper: {
+    flexDirection: 'row',
+    paddingVertical: 10,
+    backgroundColor: colors.bgDark,
+    borderTopRightRadius: 10,
+    borderTopLeftRadius: 10,
+  },
+  bottomButtonStyles: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  singleImage: {
+    width: 90,
+    height: 90, 
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderColor: colors.border,
+    borderWidth: 1,
+    borderRadius: 10,
+    resizeMode: 'contain',
+  },
+  selectedImage:{
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 10,
+  },
+  textarea: {
+    width: '100%',
+    height: 200,
+    borderColor: colors.border,
+    color: colors.textDark,
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+  },
+  errorWrapper: {
+    width: '100%',
+  },
+  errorMessage: {
+    color: colors.error,
+    fontSize: 11,
+    textAlign: 'right',
+  },
 
-      bottomButtonsWrapper: {
-        flexDirection: 'row',
-        paddingVertical: 10,
-        backgroundColor: colors.bgDark,
-        borderTopRightRadius: 10,
-        borderTopLeftRadius: 10,
-      },
-      bottomButtonStyles: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        flexDirection: 'row',
-      },
-
-      //=========================================================
-
-      singleImage: {
-        width: 90,
-        height: 90,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderColor: colors.border,
-        borderWidth: 1,
-        borderRadius: 10,
-        resizeMode: 'contain',
-      },
-
-      textarea : {
-        width: '100%',
-        height: 200,
-        borderColor: colors.border,
-        color: colors.textDark,
-        borderWidth: 1,
-        paddingHorizontal: 10,
-        borderRadius: 10,
-      },
-
-      //=========================================================
-
-      errorWrapper: {
-        width: '100%',
-      },
-      errorMessage: {
-        color: colors.error,
-        fontSize: 11,
-        textAlign: 'right',
-      },
-
-      //=========================================================
 });
 
 export default AddProductScreen;
