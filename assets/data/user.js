@@ -1,5 +1,4 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { log_data } from "./system";
 
 // After clicking the Send OTP button
 const sendOtp = async (phoneNumber) => {

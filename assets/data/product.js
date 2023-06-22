@@ -1,27 +1,42 @@
-const addProduct = async (formData, userToken = '1', userPhone = '714124766', userType = 'supplier') => {
-  const url = 'https://v2.genzo.lk/App_api/saveProducts';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-  const headers = new Headers({
-    'Content-Type': 'multipart/form-data',
-    userToken: userToken,
-    userPhone: userPhone,
-    userType: userType,
-  });
-
-  const options = {
-    method: 'POST',
-    headers: headers,
-    body: formData,
-  };
-
+const addProduct = async (formData) => {
   try {
+    const data = await AsyncStorage.getItem('log_data');
+
+    if (!data) {
+      console.log('log_data does not exist in AsyncStorage (user.js)');
+      return { payload: "Error", ref: "", stt: "error" };
+    }
+
+    const logData = JSON.parse(data);
+    const userToken = logData.log_userToken;
+    const userPhone = logData.log_userNumber;
+    const userType = logData.log_userType;
+
+    const url = 'https://v2.genzo.lk/App_api/saveProducts';
+
+    const headers = new Headers({
+      'Content-Type': 'multipart/form-data',
+      userToken: userToken,
+      userPhone: userPhone,
+      userType: userType,
+    });
+
+    const options = {
+      method: 'POST',
+      headers: headers,
+      body: formData,
+    };
+
     const response = await fetch(url, options);
-    const data = await response.json();
-    return data;
+    const responseData = await response.json();
+    return responseData;
   } catch (error) {
     throw new Error('Failed to add/update product.');
   }
 };
+
 
 
 const getProducts = async () => {

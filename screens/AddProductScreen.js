@@ -136,9 +136,19 @@ const AddProductScreen = () => {
       addProduct(formData) // Call addProduct with the productData
       .then((response) => {
         console.log(response)
-        {/*Alert.alert('Success', 'Product added/updated successfully!', [
-          { text: 'OK', onPress: () => console.log('OK Pressed') },
-        ]); */}
+
+        if (response.stt === 'ok') {
+          Alert.alert('Success', 'Product added/updated successfully!', [
+            { text: 'OK', onPress: () => console.log('OK Pressed') },
+          ]);
+          handleReset();
+        } else {
+          Alert.alert('Error', 'Failed to add/update product.', [
+            { text: 'OK', onPress: () => console.log('OK Pressed') },
+          ]);
+        }
+        
+         
       })
       .catch((error) => {
         Alert.alert('Error', 'Failed to add/update product.');
