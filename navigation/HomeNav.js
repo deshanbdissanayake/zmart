@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, {useContext} from 'react';
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
@@ -18,6 +18,7 @@ import ProListNav from './ProListNav';
 import MyProListNav from './MyProListNav';
 import AddProductScreen from '../screens/AddProductScreen';
 import colors from '../assets/colors/colors';
+import AuthContext from '../AuthContext';
 
 const Drawer = createDrawerNavigator();
 
@@ -25,6 +26,12 @@ const Drawer = createDrawerNavigator();
 const CustomDrawerContent = ({ navigation, state, descriptors }) => {
   const closeDrawer = () => {
     navigation.closeDrawer();
+  };
+
+  const { handleLogout } = useContext(AuthContext);
+
+  const handleLogoutClick = () => {
+    handleLogout();
   };
 
   return (
@@ -52,7 +59,14 @@ const CustomDrawerContent = ({ navigation, state, descriptors }) => {
       {/* Other Drawer Buttons */}
       <DrawerItem label="Terms & Conditions" labelStyle={styles.drawerItem} />
       <DrawerItem label="About Us" labelStyle={styles.drawerItem} />
-      <DrawerItem label="Logout" labelStyle={styles.drawerItem} />
+      <DrawerItem 
+        label="Logout" 
+        labelStyle={styles.drawerItem} 
+        onPress={() => {
+          handleLogoutClick();
+        }} 
+      />
+
     </DrawerContentScrollView>
   );
 };
@@ -60,13 +74,18 @@ const CustomDrawerContent = ({ navigation, state, descriptors }) => {
 const HomeNav = () => {
   return (
     <Drawer.Navigator
-      initialRouteName="Product List"
+      initialRouteName="My Products"
       drawerContent={(props) => <CustomDrawerContent {...props} />}
       screenOptions={{
         drawerActiveTintColor: colors.secondary,
         drawerInactiveTintColor: colors.white,
       }}
     >
+      <Drawer.Screen
+        name="My Products"
+        component={MyProListNav}
+        options={{ headerShown: false }}
+      />
       <Drawer.Screen
         name="Products List"
         component={ProListNav}
@@ -85,11 +104,6 @@ const HomeNav = () => {
           headerTintColor: colors.secondary,
           headerShown: true,
         }}
-      />
-      <Drawer.Screen
-        name="My Products"
-        component={MyProListNav}
-        options={{ headerShown: false }}
       />
     </Drawer.Navigator>
   );

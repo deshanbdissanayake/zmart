@@ -4,12 +4,12 @@ import colors from '../assets/colors/colors';
 import { log_data } from '../assets/data/system';
 
 const SplashScreen = ({ navigation }) => {
-  useEffect(() => {
+  /*useEffect(() => {
     // Simulating a delay before navigating to the next screen
     setTimeout(() => {
       navigation.navigate('Main');
     }, 2000); // Adjust the delay time as needed
-  }, [navigation]);
+  }, [navigation]);*/
 
   return (
     <View style={styles.container}>

@@ -12,19 +12,19 @@ import {
 import { Ionicons, MaterialCommunityIcons } from 'react-native-vector-icons';
 
 import colors from '../assets/colors/colors';
-import Header from '../components/header/Header';
 import Footer from '../components/footer/Footer';
 import ProductItem from '../components/products/ProductItem';
 import { getProducts } from '../assets/data/product';
-import { log_data } from '../assets/data/system'; 
 
 const ProductListScreen = ({ route }) => {
   const { propsData } = route.params;
 
+  const title = propsData.type === 'myProducts' ? 'My Product List' : 'All Suppliers Products';
+
   const [search, setSearch] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [products, setProducts] = useState([]);
-  const [proListTitle, setProListTitle] = useState('Product List');
+  const [proListTitle, setProListTitle] = useState(title);
   const [selectedCount, setSelectedCount] = useState(0);
 
   const checkCountFunc = (n) => {
@@ -64,7 +64,7 @@ const ProductListScreen = ({ route }) => {
       ...propsForItems,
       shareBtnClicked: true,
     });
-    setProListTitle('Share Products');
+    setProListTitle('Share My Products');
   };
 
   const handleInvoiceBtnClick = () => {
@@ -72,7 +72,7 @@ const ProductListScreen = ({ route }) => {
       ...propsForItems,
       invoiceBtnClicked: true,
     });
-    setProListTitle('Invoice Products');
+    setProListTitle('Invoice My Products');
   };
 
   const handleStockBtnClick = () => {
@@ -80,7 +80,7 @@ const ProductListScreen = ({ route }) => {
       ...propsForItems,
       stockBtnClicked: true,
     });
-    setProListTitle('Stock Products');
+    setProListTitle('My Products Stock Update');
   };
 
   const handleCancelBtnClick = () => {
@@ -91,7 +91,7 @@ const ProductListScreen = ({ route }) => {
       stockBtnClicked: false,
     });
     setSelectedCount(0);
-    setProListTitle('Product List');
+    setProListTitle(title);
   };
 
   const handleNextBtnClick = () => {

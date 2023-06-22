@@ -8,18 +8,18 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage'; 
 
-import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from 'react-native-vector-icons';
 import colors from '../assets/colors/colors';
 
 import { sendOtp, verifyNumber, saveUser } from '../assets/data/user';
 import { log_data } from '../assets/data/system'; //getting dummy data
 
-const RegistrationScreen = () => {
+const RegistrationScreen = ({navigation}) => {
   //========================================================================================= 
   //form states
+  const [userToken, setUserToken] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [otp, setOtp] = useState('');
 
@@ -46,8 +46,6 @@ const RegistrationScreen = () => {
   const [phoneNumberVerified, setPhoneNumberVerified] = useState(false);
 
   const [logData, setLogData] = useState(log_data);
-
-  const navigation = useNavigation();
 
   //=========================================================================================
   // handle button click
@@ -92,7 +90,7 @@ const RegistrationScreen = () => {
       }
 
       // Validation for Name
-      if (!name) {
+      if (!name || name.length < 4) {
         setNameError(true);
         isValid = false;
       } else {
@@ -165,71 +163,98 @@ const RegistrationScreen = () => {
       });
   };
 
-  //confirm otp and verify number
-  const verifyNumberFunc = () => {
-    verifyNumber(phoneNumber, otp)
-      .then((verifyData) => {
-        if (verifyData.stt == 'ok') {
+  // confirm otp and verify number
+const verifyNumberFunc = async () => {
+  try {
+    const verifyData = await verifyNumber(phoneNumber, otp);
+    if (verifyData.stt === 'ok') {
 
-          //=================================================
-          //update log data
-          //=================================================
-          setLogData(prevLogData => ({
-            ...prevLogData,
-            log_userToken: verifyData.payload.token
-          }));          
-          //=================================================
-          
-          setPhoneNumberVerified(true);
-        } else {
-          setOtpError(true);
-        }
-      })
-      .catch((error) => {
-        console.error('Verification error:', error);
-        setOtpError(true);
-      })
-      .finally(() => {
-        setButtonLoading(false); // Disable loading state
-      });
-  };
+      // =================================================
+      
+      if(verifyData.payload.reg === 'required'){
+        // Update log data
+        const updatedLogData = {
+          ...logData,
+          log_userToken: verifyData.payload.token
+        };
+        // Call saveAsyncStorage and wait for it to complete
+        setUserToken(verifyData.payload.token)
+        await saveAsyncStorage(updatedLogData);
+
+        setPhoneNumberVerified(true);
+      }else{ // if user already registered
+        // Update log data
+        const updatedLogData = {
+          ...logData,
+          log_status: true,
+          log_userToken: verifyData.payload.token,
+          log_userNumber: verifyData.payload.user.user_phone,
+          log_userName: verifyData.payload.user.user_name,
+          log_userShop: verifyData.payload.user.user_shop,
+          log_userWhsp: verifyData.payload.user.wapp_no,
+          log_userAddress: verifyData.payload.user.user_address,
+        };
+
+        // Call saveAsyncStorage and wait for it to complete
+        await saveAsyncStorage(updatedLogData);
+
+        // Check the updated logData.log_status value
+        navigation.navigate('Home');
+        
+      }
+
+      // =================================================
+      
+    } else {
+      setOtpError(true);
+    }
+  } catch (error) {
+    console.error('Verification error:', error);
+    setOtpError(true);
+  } finally {
+    setButtonLoading(false); // Disable loading state
+  }
+};
+
 
   //save user
   const saveUserFunc = async () => {
-    clearAsyncStorage(); // Clear async storage
-  
+
     const formData = new FormData();
-  
+
     formData.append('address', address);
     formData.append('nic', nic);
     formData.append('shopname', shopName);
     formData.append('supname', name);
     formData.append('wapp_no', whatsapp);
     formData.append('user_phone', phoneNumber);
-  
+
     try {
       const verifyStatus = await saveUser(formData);
       if (verifyStatus.stt === 'ok') {
         console.log('User saved');
-  
+
         // Update log data
-        setLogData((prevLogData) => ({
-          ...prevLogData,
+        const updatedLogData = {
+          ...logData,
           log_status: true,
+          log_userToken: userToken,
           log_userNumber: phoneNumber,
           log_userName: name,
           log_userShop: shopName,
           log_userWhsp: whatsapp,
           log_userAddress: address,
-        }));
-  
-        // this await doesn't work yet.
-        await saveAsyncStorage(); // Call saveAsyncStorage and wait for it to complete
-        if(logData.log_status){ //check here
-          navigation.navigate('Home');
-        }else{
-          navigation.navigate('Home');
-        }
+        };
+
+        // Call saveAsyncStorage and wait for it to complete
+        await saveAsyncStorage(updatedLogData);
+
+        // Check the updated logData.log_status value
+        navigation.navigate('Home');
+
+        //clearAsyncStorage();
+      }else{
+        console.log(verifyStatus)
       }
     } catch (error) {
       console.error('Verification error:', error);
@@ -237,6 +262,7 @@ const RegistrationScreen = () => {
       setButtonLoading(false); // Disable loading state
     }
   };
+
 
   //resend button click
   const resendButtonClick = () => {
@@ -255,9 +281,9 @@ const RegistrationScreen = () => {
   //=========================================================================================
 
   // Save log_data to AsyncStorage
-  const saveAsyncStorage = async () => {
+  const saveAsyncStorage = async (asyncData) => {
     try {
-      const logDataString = JSON.stringify(logData);
+      const logDataString = JSON.stringify(asyncData);
       console.log('Save async:', logDataString);
   
       await AsyncStorage.setItem('log_data', logDataString);
@@ -267,16 +293,7 @@ const RegistrationScreen = () => {
     }
   };
 
-  // Function to clear AsyncStorage
-  const clearAsyncStorage = async () => {
-    try {
-      await AsyncStorage.clear();
-      console.log('AsyncStorage cleared successfully.');
-    } catch (error) {
-      console.error('Error clearing AsyncStorage:', error);
-      // Handle the error appropriately
-    }
-  };
+  
 
   //=========================================================================================
 
@@ -456,7 +473,7 @@ const RegistrationScreen = () => {
               {nameError ? (
                 <View style={styles.errorWrapper}>
                   <Text style={styles.errorMessage}>
-                    Check your Name again!
+                    Name should have more than 4 letters!
                   </Text>
                 </View>
               ) : (
