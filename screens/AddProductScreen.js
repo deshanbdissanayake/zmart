@@ -70,73 +70,74 @@ const AddProductScreen = () => {
     }));
   };
 
-  const handleButtonClick = () => {
+  const handleButtonClick = async () => {
     const errors = {};
-
+  
     if (proName.trim() === '') {
       errors.proNameError = true;
     }
-
+  
     if (proDesc.trim() === '') {
       errors.proDescError = true;
     }
-
+  
     if (proPrice.trim() === '') {
       errors.proPriceError = true;
     }
-
+  
     if (proQty.trim() === '') {
       errors.proQtyError = true;
     }
-
+  
     if (image1 === '') {
       errors.image1Error = true;
     }
-
+  
     if (image2 === '') {
       errors.image2Error = true;
     }
-
+  
     if (image3 === '') {
-      errors.image3Error = true; 
+      errors.image3Error = true;
     }
-
+  
     setFormErrors(errors);
-
+  
     if (Object.keys(errors).length === 0) {
       setLoading(true);
       console.log('Button pressed');
-      
-      
-      // Create a new form data object
-      const formData = new FormData();
+  
+      try {
+        // Create a new form data object
+        const formData = new FormData();
+  
+        // Append the image data to the form data object
+        formData.append('image1', {
+          uri: image1,
+          name: 'image.jpg',
+          type: 'image/jpeg',
+        });
+        formData.append('image2', {
+          uri: image2,
+          name: 'image.jpg',
+          type: 'image/jpeg',
+        });
+        formData.append('image3', {
+          uri: image3,
+          name: 'image.jpg',
+          type: 'image/jpeg',
+        });
+        formData.append('proId', proId);
+        formData.append('proName', proName);
+        formData.append('proDes', proDesc);
+        formData.append('proPrice', proPrice);
+        formData.append('proQty', proQty);
+  
+        const response = await addProduct(formData); // Call addProduct with the productData
+        console.log('check2')
 
-      // Append the image data to the form data object
-      formData.append('image1', {
-        uri: image1,
-        name: 'image.jpg',
-        type: 'image/jpeg',
-      });
-      formData.append('image2', {
-        uri: image2,
-        name: 'image.jpg',
-        type: 'image/jpeg',
-      });
-      formData.append('image3', {
-        uri: image3,
-        name: 'image.jpg',
-        type: 'image/jpeg',
-      });
-      formData.append('proId', proId);
-      formData.append('proName', proName);
-      formData.append('proDes', proDesc);
-      formData.append('proPrice', proPrice);
-      formData.append('proQty', proQty);
-
-      addProduct(formData) // Call addProduct with the productData
-      .then((response) => {
-        console.log(response)
-
+        console.log(response);
+  
         if (response.stt === 'ok') {
           Alert.alert('Success', 'Product added/updated successfully!', [
             { text: 'OK', onPress: () => console.log('OK Pressed') },
@@ -147,17 +148,14 @@ const AddProductScreen = () => {
             { text: 'OK', onPress: () => console.log('OK Pressed') },
           ]);
         }
-        
-         
-      })
-      .catch((error) => {
-        Alert.alert('Error', 'Failed to add/update product.');
-      })
-      .finally(() => {
+      } catch (error) {
+        Alert.alert('Error', 'Failed to add/update product try.');
+      } finally {
         setLoading(false);
-      });
+      }
     }
   };
+  
 
   const handleReset = () => {
     setProductData({

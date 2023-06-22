@@ -29,6 +29,7 @@ const addProduct = async (formData) => {
       body: formData,
     };
 
+    console.log('save product run')
     const response = await fetch(url, options);
     const responseData = await response.json();
     return responseData;
