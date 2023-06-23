@@ -12,8 +12,8 @@ import colors from '../assets/colors/colors';
 // Create a stack navigator
 const Stack = createStackNavigator();
 
-function MyProListNav() {
-
+const MyProListNav = () => {
+  
   return (
       <Stack.Navigator>
         <Stack.Screen

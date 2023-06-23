@@ -10,7 +10,7 @@ import colors from '../assets/colors/colors';
 // Create a stack navigator
 const Stack = createStackNavigator();
 
-function ProListNav() {
+const ProListNav = () => {
 
   return (
       <Stack.Navigator>

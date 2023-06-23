@@ -17,6 +17,7 @@ import ProductItem from '../components/products/ProductItem';
 import { getProducts } from '../assets/data/product';
 
 const ProductListScreen = ({ route }) => {
+
   const { propsData } = route.params;
   const title = propsData.type === 'myProducts' ? 'My Product List' : 'All Suppliers Products';
 
@@ -35,6 +36,19 @@ const ProductListScreen = ({ route }) => {
   });
 
   useEffect(() => {
+    const fetchProducts = async () => {
+      setIsLoading(true);
+      try {
+        const response = await getProducts(propsData.type);
+        setProducts(response);
+        setPrevProducts(response);
+      } catch (error) {
+        console.log('Error fetching products:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     fetchProducts();
   }, []);
 
@@ -57,19 +71,6 @@ const ProductListScreen = ({ route }) => {
       setSelectedCount(selectedCount + parseInt(n))
     }
   }
-
-  const fetchProducts = async () => {
-    setIsLoading(true);
-    try {
-      const response = await getProducts(propsData.type);
-      setProducts(response);
-      setPrevProducts(response);
-    } catch (error) {
-      console.log('Error fetching products:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleShareBtnClick = () => {
     setPropsForItems({

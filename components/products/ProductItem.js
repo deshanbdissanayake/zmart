@@ -8,7 +8,8 @@ import { CheckBox } from 'react-native-elements';
 import { log_data } from '../../assets/data/system';
 
 const ProductItem = ({ product, props, type }) => {
-  const [isChecked, setIsChecked] = useState(false);
+  
+  const [isChecked, setIsChecked] = useState(false); 
 
   const handleCheckBoxToggle = () => {
     setIsChecked(!isChecked);
@@ -39,7 +40,7 @@ const ProductItem = ({ product, props, type }) => {
         </View>
       ) : null}
 
-      <View style={styles.cardWrapper}>
+      <View style={[styles.cardWrapper, { height: (type === 'myProducts') ? 120 : 80 }]}>
         <View style={styles.imageWrapper}>
           <TouchableOpacity onPress={handleTouchableOpacityPress}>
             <Image source={{uri : product.image1}} style={styles.imageStyles} />
@@ -64,25 +65,27 @@ const ProductItem = ({ product, props, type }) => {
 
           <View>
             <Text style={styles.priceStyles}>Rs.{product.price}</Text>
-            <View style={styles.qtyWrapper}>
-              <Text style={styles.qtyStyles}>Avb Qty: {product.qty}</Text>
-              <View
-                style={[
-                  styles.statusWrapper,
-                  { alignItems: product.qty > 0 ? 'center' : 'flex-start' },
-                ]}
-              >
-                <Text style={styles.statusText}>
-                  {product.qty > 0 ? 'In Stock' : 'Out of Stock'}
-                </Text>
+            {(type === 'myProducts')?(
+              <View style={styles.qtyWrapper}>
+                <Text style={styles.qtyStyles}>Avb Qty: {product.qty}</Text>
                 <View
                   style={[
-                    styles.statusDot,
-                    { backgroundColor: product.qty > 0 ? colors.green : colors.red },
+                    styles.statusWrapper,
+                    { alignItems: product.qty > 0 ? 'center' : 'flex-start' },
                   ]}
-                ></View>
+                >
+                  <Text style={styles.statusText}>
+                    {product.qty > 0 ? 'In Stock' : 'Out of Stock'}
+                  </Text>
+                  <View
+                    style={[
+                      styles.statusDot,
+                      { backgroundColor: product.qty > 0 ? colors.green : colors.red },
+                    ]}
+                  ></View>
+                </View>
               </View>
-            </View>
+            ) : null }
           </View>
         </View>
       </View>
@@ -106,13 +109,12 @@ const styles = StyleSheet.create({
   cardWrapper: {
     flex: 8,
     flexDirection: 'row',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingHorizontal: 2,
+    paddingVertical: 2,
     borderWidth: 1,
     borderColor: colors.border,
     borderRadius: 10,
     marginBottom: 10,
-    height: 120,
     overflow: 'hidden',
   },
   imageWrapper: {
