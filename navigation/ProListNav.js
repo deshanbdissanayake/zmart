@@ -39,9 +39,6 @@ function ProListNav() {
             headerTintColor: colors.secondary,
             headerShown: true,
           }}
-          initialParams={{
-            propsData: { type: 'productList' },
-          }}
         />
       </Stack.Navigator>
   );

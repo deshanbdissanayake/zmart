@@ -41,9 +41,6 @@ function MyProListNav() {
             headerTintColor: colors.secondary,
             headerShown: true,
           }}
-          initialParams={{
-            propsData: { type: 'myProducts' },
-          }} 
         />
         <Stack.Screen
           name="Edit Product"

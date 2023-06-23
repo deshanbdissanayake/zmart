@@ -18,23 +18,14 @@ import { getProducts } from '../assets/data/product';
 
 const ProductListScreen = ({ route }) => {
   const { propsData } = route.params;
-
   const title = propsData.type === 'myProducts' ? 'My Product List' : 'All Suppliers Products';
 
-  const [search, setSearch] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [products, setProducts] = useState([]);
+  const [prevProducts, setPrevProducts] = useState([]);
   const [proListTitle, setProListTitle] = useState(title);
   const [selectedCount, setSelectedCount] = useState(0);
 
-  const checkCountFunc = (n) => {
-    console.log(n)
-    if(n == 0){
-      setSelectedCount(0)
-    }else{
-      setSelectedCount(selectedCount + parseInt(n))
-    }
-  }
 
   const [propsForItems, setPropsForItems] = useState({
     shareBtnClicked: false,
@@ -47,11 +38,32 @@ const ProductListScreen = ({ route }) => {
     fetchProducts();
   }, []);
 
+  const handleSearch = (text) => {
+
+    if (text.length > 0) {
+      const filteredProducts = products.filter(product => product.name.includes(text));
+      setProducts(filteredProducts);
+    } else {
+      setProducts(prevProducts); 
+    }
+  };
+  
+
+  const checkCountFunc = (n) => {
+    console.log(n)
+    if(n == 0){
+      setSelectedCount(0)
+    }else{
+      setSelectedCount(selectedCount + parseInt(n))
+    }
+  }
+
   const fetchProducts = async () => {
     setIsLoading(true);
     try {
-      const response = await getProducts();
+      const response = await getProducts(propsData.type);
       setProducts(response);
+      setPrevProducts(response);
     } catch (error) {
       console.log('Error fetching products:', error);
     } finally {
@@ -113,8 +125,7 @@ const ProductListScreen = ({ route }) => {
           placeholder="Search Products Here"
           keyboardType="default"
           maxLength={15}
-          value={search}
-          onChangeText={setSearch}
+          onChangeText={handleSearch}
         />
         <View style={styles.searchIcon}>
           <Ionicons name="search" size={24} color={colors.textDark} />
@@ -131,7 +142,7 @@ const ProductListScreen = ({ route }) => {
           data={products}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item }) => (
-            <ProductItem product={item} props={propsForItems} />
+            <ProductItem product={item} props={propsForItems} type={propsData.type} />
           )}
           showsVerticalScrollIndicator={false}
         />

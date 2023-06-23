@@ -11,32 +11,22 @@ import {
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from 'react-native-vector-icons';
 import colors from '../assets/colors/colors';
-import { getProductByProId } from '../assets/data/product';
 import Footer from '../components/footer/Footer';
 
 const SingleProductScreen = ({ route }) => {
   const { propsData } = route.params;
 
+  //console.log(propsData);
+
   const [isLoading, setIsLoading] = useState(true);
   const [productData, setProductData] = useState([]);
-  const [mainImage, setMainImage] = useState('');
+  const [mainImage, setMainImage] = useState(propsData.product.image1);
+  const images = [propsData.product.image1, propsData.product.image2, propsData.product.image3];
 
   useEffect(() => {
-    fetchProductData();
+    setProductData(propsData.product);
+    setIsLoading(false);
   }, []);
-
-  const fetchProductData = async () => {
-    setIsLoading(true);
-    try {
-      const response = await getProductByProId(1);
-      setProductData(response);
-      setMainImage(response.images[0]);
-    } catch (error) {
-      console.log('Error fetching products:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const changeMainImage = (image) => {
     setMainImage(image);
@@ -49,13 +39,11 @@ const SingleProductScreen = ({ route }) => {
   );
 
   const renderProductList = () => {
-    const { status, images, name, price, qty, desc } = productData;
+    const { status, name, price, qty, desc } = productData;
 
     const statusStyles = [
       styles.statusStyles,
-      status == 'active'
-        ? styles.activeStatusStyles
-        : styles.pauseStatusStyles,
+      status == 'active' ? styles.activeStatusStyles : styles.pauseStatusStyles,
     ];
     const stockColor = qty > 0 ? colors.green : colors.red;
 
@@ -67,19 +55,16 @@ const SingleProductScreen = ({ route }) => {
             <View style={styles.mainImageWrapper}>
               <Image
                 style={styles.mainImageStyles}
-                source={mainImage}
+                source={{ uri: mainImage }}
                 alt="main image"
               />
             </View>
             <View style={styles.smallImageWrapper}>
               {images.map((image, index) => (
-                <TouchableOpacity
-                  key={index}
-                  onPress={() => changeMainImage(image)}
-                >
+                <TouchableOpacity key={index} onPress={() => changeMainImage(image)}>
                   <Image
                     style={styles.smallImageStyles}
-                    source={image}
+                    source={{ uri: image }}
                     alt={`image ${index + 1}`}
                   />
                 </TouchableOpacity>
@@ -91,29 +76,20 @@ const SingleProductScreen = ({ route }) => {
             <View style={styles.priceWrapper}>
               <View style={styles.qtyWrapper}>
                 <View style={styles.stockTextWrapper}>
-                  <View
-                    style={[styles.dotStyle, { backgroundColor: stockColor }]}
-                  ></View>
-                  <Text
-                    style={[
-                      styles.stockTextStyle,
-                      { color: stockColor },
-                    ]}
-                  >
+                  <View style={[styles.dotStyle, { backgroundColor: stockColor }]}></View>
+                  <Text style={[styles.stockTextStyle, { color: stockColor }]}>
                     {qty > 0 ? 'In Stock' : 'Out of Stock'}
                   </Text>
                 </View>
                 <Text style={styles.qtyStyle}>Avb Qty : {qty}</Text>
               </View>
-              <Text style={styles.priceStyle}>
-                Rs.{parseFloat(price).toFixed(2)}
-              </Text>
+              <Text style={styles.priceStyle}>Rs.{parseFloat(price).toFixed(2)}</Text>
             </View>
             <Text style={styles.descStyle}>{desc}</Text>
           </View>
         </ScrollView>
 
-        {propsData.type === 'myProducts' ? (            
+        {propsData.type === 'myProducts' ? (
           <View style={styles.bottomButtonsWrapper}>
             <TouchableOpacity style={styles.bottomButtonStyles}>
               <Ionicons name="trash-bin" size={24} color={colors.red} />
@@ -126,17 +102,12 @@ const SingleProductScreen = ({ route }) => {
               />
             </TouchableOpacity>
             <TouchableOpacity style={styles.bottomButtonStyles}>
-              <Ionicons
-                name="md-pause-circle"
-                size={24}
-                color={colors.secondary}
-              />
+              <Ionicons name="md-pause-circle" size={24} color={colors.secondary} />
             </TouchableOpacity>
-            {/*<TouchableOpacity><Ionicons name="md-play-circle" size={24} color={colors.secondary} /></TouchableOpacity>*/}
           </View>
-        ): 
+        ) : (
           <Footer />
-        }
+        )}
       </View>
     );
   };

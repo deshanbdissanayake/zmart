@@ -7,7 +7,7 @@ import { CheckBox } from 'react-native-elements';
 
 import { log_data } from '../../assets/data/system';
 
-const ProductItem = ({ product, props }) => {
+const ProductItem = ({ product, props, type }) => {
   const [isChecked, setIsChecked] = useState(false);
 
   const handleCheckBoxToggle = () => {
@@ -19,10 +19,11 @@ const ProductItem = ({ product, props }) => {
   const navigation = useNavigation();
 
   const handleTouchableOpacityPress = () => {
-    const myArray = ['item1', 'item2', 'item3']; // Example array
-
     navigation.navigate('Single Product', {
-      myArray: myArray,
+      propsData: {
+        type: type,
+        product: product,
+      },
     });
   };
 
@@ -41,14 +42,14 @@ const ProductItem = ({ product, props }) => {
       <View style={styles.cardWrapper}>
         <View style={styles.imageWrapper}>
           <TouchableOpacity onPress={handleTouchableOpacityPress}>
-            <Image source={product.image} style={styles.imageStyles} />
+            <Image source={{uri : product.image1}} style={styles.imageStyles} />
           </TouchableOpacity>
         </View>
         <View style={styles.textWrapper}>
           <View style={styles.nameWrapper}>
             <TouchableOpacity onPress={handleTouchableOpacityPress} style={styles.nameTO}>
               <Text style={styles.nameStyles} numberOfLines={2}>
-                {product.name}
+                {product.name} 
               </Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={handleTouchableOpacityPress}>
@@ -62,7 +63,7 @@ const ProductItem = ({ product, props }) => {
           </View>
 
           <View>
-            <Text style={styles.priceStyles}>${product.price}</Text>
+            <Text style={styles.priceStyles}>Rs.{product.price}</Text>
             <View style={styles.qtyWrapper}>
               <Text style={styles.qtyStyles}>Avb Qty: {product.qty}</Text>
               <View

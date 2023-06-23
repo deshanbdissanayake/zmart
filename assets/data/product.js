@@ -34,81 +34,49 @@ const addProduct = async (formData) => {
     const responseData = await response.json();
     return responseData;
   } catch (error) {
-    throw new Error('Failed to add/update product.');
+    console.error(error);
+    return { payload: "Error", ref: "", stt: "error" };
   }
 };
 
 
 
-const getProducts = async () => {
-    const products = [
-        {
-          id : 1,
-          name: 'Organic Superfood Blend with Spirulina, Chlorella, and Wheatgrass',
-          desc : 'desc 1',
-          price: 10.99,
-          image: require('../images/products/1.jpg'),
-          images : [
-            require('../images/products/1.jpg'),
-            require('../images/products/2.jpg'),
-            require('../images/products/3.jpg'),
-          ],
-          qty: 10,
-          user : 1,
-          commission : 100.00,
-          status: 'active',
-        },
-        {
-          id : 2, 
-          name: 'Ultra-Hydrating Anti-Aging Facial Moisturizer with Vitamin C and Hyaluronic Acid',
-          desc : 'desc 2',
-          price: 19.99,
-          image: require('../images/products/2.jpg'),
-          images : [
-            require('../images/products/1.jpg'),
-            require('../images/products/2.jpg'),
-            require('../images/products/3.jpg'),
-          ],
-          qty: 1,
-          user : 1,
-          commission : 100.00,
-          status: 'active',
-        },
-        {
-          id : 3,
-          name: 'Premium Noise-Canceling Bluetooth Headphones with Built-in Microphone and 40-Hour Battery Life',
-          desc : 'desc 3',
-          price: 7.99,
-          image: require('../images/products/3.jpg'),
-          images : [
-            require('../images/products/1.jpg'),
-            require('../images/products/2.jpg'),
-            require('../images/products/3.jpg'),
-          ],
-          qty: 0,
-          user : 1,
-          commission : 100.00,
-          status: 'active',
-        },
-        {
-          id : 4,
-          name: 'Extra Strength Joint Support Supplement with Glucosamine, Chondroitin, and MSM for Joint Health and Mobility',
-          desc : 'desc 4',
-          price: 17.99,
-          image: require('../images/products/4.jpg'),
-          images : [
-            require('../images/products/1.jpg'),
-            require('../images/products/2.jpg'),
-            require('../images/products/3.jpg'),
-          ],
-          qty: 50,
-          user : 1,
-          commission : 100.00,
-          status: 'active',
-        },
-      ];
-    return products;
-}
+const getProducts = async (type) => {
+  try {
+    const data = await AsyncStorage.getItem('log_data');
+
+    if (!data) {
+      console.log('log_data does not exist in AsyncStorage (user.js)');
+      return { payload: "Error", ref: "", stt: "error" };
+    }
+
+    const logData = JSON.parse(data);
+    const { log_userToken, log_userNumber, log_userType } = logData;
+
+    const url = type === 'myProducts' ? 'https://v2.genzo.lk/App_api/getMyProducts' : 'https://v2.genzo.lk/App_api/getAllProducts';
+
+    const headers = {
+      'userToken': log_userToken,
+      'userPhone': log_userNumber,
+      'userType': log_userType
+    };
+
+    const options = {
+      method: 'GET',
+      headers: headers,
+    };
+
+    const response = await fetch(url, options);
+    const json = await response.json();
+    // console.log(json);
+    return json;
+  } catch (error) {
+    console.error(error);
+    return { payload: "Error", ref: "", stt: "error" };
+  }
+};
+
+
 
 const getProductByProId  = async (id) => {
   const product = {
