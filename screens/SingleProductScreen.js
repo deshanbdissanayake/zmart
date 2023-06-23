@@ -16,8 +16,6 @@ import Footer from '../components/footer/Footer';
 const SingleProductScreen = ({ route }) => {
   const { propsData } = route.params;
 
-  //console.log(propsData);
-
   const [isLoading, setIsLoading] = useState(true);
   const [productData, setProductData] = useState([]);
   const [mainImage, setMainImage] = useState(propsData.product.image1);
@@ -27,6 +25,18 @@ const SingleProductScreen = ({ route }) => {
     setProductData(propsData.product);
     setIsLoading(false);
   }, []);
+
+  const handleDelete = () => {
+    console.log('Delete')
+  }
+
+  const handleEdit = () => {
+    console.log('Edit')
+  }
+
+  const handleStatus = (currentStatus) => {
+    console.log('Change Status - ',currentStatus)
+  }
 
   const changeMainImage = (image) => {
     setMainImage(image);
@@ -91,18 +101,18 @@ const SingleProductScreen = ({ route }) => {
 
         {propsData.type === 'myProducts' ? (
           <View style={styles.bottomButtonsWrapper}>
-            <TouchableOpacity style={styles.bottomButtonStyles}>
+            <TouchableOpacity style={styles.bottomButtonStyles} onPress={handleDelete}>
               <Ionicons name="trash-bin" size={24} color={colors.red} />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.bottomButtonStyles}>
+            <TouchableOpacity style={styles.bottomButtonStyles} onPress={handleEdit}>
               <MaterialCommunityIcons
                 name="circle-edit-outline"
                 size={24}
                 color={colors.secondary}
               />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.bottomButtonStyles}>
-              <Ionicons name="md-pause-circle" size={24} color={colors.secondary} />
+            <TouchableOpacity style={styles.bottomButtonStyles} onPress={handleStatus(status)}>
+              <Ionicons name={status === 'active' ? 'md-pause-circle' : 'md-play-circle'} size={24} color={colors.secondary} />
             </TouchableOpacity>
           </View>
         ) : (
