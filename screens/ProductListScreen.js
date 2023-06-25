@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   TextInput,
   TouchableOpacity,
+  RefreshControl,
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from 'react-native-vector-icons';
 
@@ -26,51 +27,49 @@ const ProductListScreen = ({ route }) => {
   const [prevProducts, setPrevProducts] = useState([]);
   const [proListTitle, setProListTitle] = useState(title);
   const [selectedCount, setSelectedCount] = useState(0);
-
+  const [refreshing, setRefreshing] = useState(false); // State for refresh control
 
   const [propsForItems, setPropsForItems] = useState({
     shareBtnClicked: false,
     invoiceBtnClicked: false,
     stockBtnClicked: false,
-    checkCountFunc : checkCountFunc,
+    checkCountFunc: checkCountFunc,
   });
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      setIsLoading(true);
-      try {
-        const response = await getProducts(propsData.type);
-        setProducts(response);
-        setPrevProducts(response);
-      } catch (error) {
-        console.log('Error fetching products:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchProducts();
   }, []);
 
-  const handleSearch = (text) => {
-
-    if (text.length > 0) {
-      const filteredProducts = products.filter(product => product.name.includes(text));
-      setProducts(filteredProducts);
-    } else {
-      setProducts(prevProducts); 
+  const fetchProducts = async () => {
+    setIsLoading(true);
+    try {
+      const response = await getProducts(propsData.type);
+      setProducts(response);
+      setPrevProducts(response);
+    } catch (error) {
+      console.log('Error fetching products:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
-  
+
+  const handleSearch = (text) => {
+    if (text.length > 0) {
+      const filteredProducts = products.filter((product) => product.name.includes(text));
+      setProducts(filteredProducts);
+    } else {
+      setProducts(prevProducts);
+    }
+  };
 
   const checkCountFunc = (n) => {
-    console.log(n)
-    if(n == 0){
-      setSelectedCount(0)
-    }else{
-      setSelectedCount(selectedCount + parseInt(n))
+    console.log(n);
+    if (n == 0) {
+      setSelectedCount(0);
+    } else {
+      setSelectedCount(selectedCount + parseInt(n));
     }
-  }
+  };
 
   const handleShareBtnClick = () => {
     setPropsForItems({
@@ -111,6 +110,12 @@ const ProductListScreen = ({ route }) => {
     console.log('button clicked');
   };
 
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchProducts();
+    setRefreshing(false);
+  };
+
   const renderLoadingIndicator = () => (
     <View style={styles.loadingContainer}>
       <ActivityIndicator size="large" />
@@ -136,7 +141,7 @@ const ProductListScreen = ({ route }) => {
       <View style={styles.proListWrapper}>
         <View style={styles.proListTitleWrapper}>
           <Text style={styles.proListTitle}>{proListTitle}</Text>
-          {selectedCount > 0 ? (<Text>{selectedCount} Selected</Text>):''}
+          {selectedCount > 0 ? <Text>{selectedCount} Selected</Text> : ''}
         </View>
 
         <FlatList
@@ -146,13 +151,16 @@ const ProductListScreen = ({ route }) => {
             <ProductItem product={item} props={propsForItems} type={propsData.type} />
           )}
           showsVerticalScrollIndicator={false}
+          refreshControl={ // Adding RefreshControl
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
         />
       </View>
 
       {propsData.type === 'myProducts' ? (
-        (propsForItems.shareBtnClicked ||
-          propsForItems.invoiceBtnClicked ||
-          propsForItems.stockBtnClicked) ? (
+        propsForItems.shareBtnClicked ||
+        propsForItems.invoiceBtnClicked ||
+        propsForItems.stockBtnClicked ? (
           <View style={styles.bottomButtonsWrapper}>
             <TouchableOpacity
               style={styles.bottomButtonStyles}
@@ -230,11 +238,9 @@ const ProductListScreen = ({ route }) => {
             </TouchableOpacity>
           </View>
         )
-      ) : 
-        <Footer/>
-      }
-
-      
+      ) : (
+        <Footer />
+      )}
     </View>
   );
 
@@ -284,7 +290,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
   },
-  proListTitleWrapper:{
+  proListTitleWrapper: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
