@@ -16,19 +16,22 @@ import * as ImagePicker from 'expo-image-picker';
 
 import { addProduct } from '../assets/data/product';
 
-const AddProductScreen = () => {
-  const [productData, setProductData] = useState({
-    proId: '',
-    proName: '',
-    proDesc: '',
-    proPrice: '',
-    proQty: '',
-    image1: '',
-    image2: '',
-    image3: '',
+const AddProductScreen = ({ route, navigation }) => {
+  const { productData, updateProductData } = route.params;
+  //console.log(productData);
+  
+  const [newProductData, setNewProductData] = useState({
+    proId: productData?.id || '',
+    proName: productData?.name || '',
+    proDesc: productData?.desc || '',
+    proPrice: productData?.price || '',
+    proQty: productData?.qty || '',
+    image1: productData?.image1 || '',
+    image2: productData?.image2 || '',
+    image3: productData?.image3 || '',
   });
 
-  const { proId, proName, proDesc, proPrice, proQty, image1, image2, image3 } = productData;
+  const { proId, proName, proDesc, proPrice, proQty, image1, image2, image3 } = newProductData;
 
   const [formErrors, setFormErrors] = useState({
     proNameError: false,
@@ -64,7 +67,7 @@ const AddProductScreen = () => {
   };
 
   const handleInputChange = (key, value) => {
-    setProductData((prevFormData) => ({
+    setNewProductData((prevFormData) => ({
       ...prevFormData,
       [key]: value,
     }));
@@ -105,7 +108,7 @@ const AddProductScreen = () => {
   
     if (Object.keys(errors).length === 0) {
       setLoading(true);
-      console.log('Button pressed');
+      console.log('Product save Button pressed');
   
       try {
         // Create a new form data object
@@ -133,18 +136,21 @@ const AddProductScreen = () => {
         formData.append('proPrice', proPrice);
         formData.append('proQty', proQty);
   
-        const response = await addProduct(formData); // Call addProduct with the productData
+        const response = await addProduct(formData); // Call addProduct with the newProductData
         console.log('check2')
 
         console.log(response);
   
+        let msg = proId != '' ? 'Updated' : 'Added'
+
         if (response.stt === 'ok') {
-          Alert.alert('Success', 'Product added/updated successfully!', [
+          
+          Alert.alert('Success', 'Product '+msg+' successfully!', [
             { text: 'OK', onPress: () => console.log('OK Pressed') },
           ]);
           handleReset();
         } else {
-          Alert.alert('Error', 'Failed to add/update product.', [
+          Alert.alert('Error', 'Failed to '+msg+' product.', [
             { text: 'OK', onPress: () => console.log('OK Pressed') },
           ]);
         }
@@ -157,31 +163,42 @@ const AddProductScreen = () => {
   };
   
 
-  const handleReset = () => {
-    setProductData({
-      proId: '',
-      proName: '',
-      proDesc: '',
-      proPrice: '',
-      proQty: '',
-      image1: '',
-      image2: '',
-      image3: '',
-    })
-    setFormErrors({
-      proNameError: false,
-      proDescError: false,
-      proPriceError: false,
-      proQtyError: false,
-      image1Error: false,
-      image2Error: false,
-      image3Error: false,
-    })
-    setLoading(false)
+  const handleReset = async () => {
+    if(proId != ''){
+      updateProductData({
+          id : proId,
+          name : proName,
+          desc : proDesc,
+          price : proPrice,
+          qty : proQty,
+        })
+      navigation.goBack();
+    }else{
+      setNewProductData({
+        proId: '',
+        proName: '',
+        proDesc: '',
+        proPrice: '',
+        proQty: '',
+        image1: '',
+        image2: '',
+        image3: '',
+      })
+      setFormErrors({
+        proNameError: false,
+        proDescError: false,
+        proPriceError: false,
+        proQtyError: false,
+        image1Error: false,
+        image2Error: false,
+        image3Error: false,
+      })
+      setLoading(false)
+    }
   }
 
   const ImageButton = ({ imageNumber }) => {
-    const imageSource = productData[`image${imageNumber}`];
+    const imageSource = newProductData[`image${imageNumber}`];
   
     return (
       <TouchableOpacity onPress={() => handleImageSelect(imageNumber)}>

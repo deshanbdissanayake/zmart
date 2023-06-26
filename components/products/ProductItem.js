@@ -7,7 +7,7 @@ import { CheckBox } from 'react-native-elements';
 
 import { log_data } from '../../assets/data/system';
 
-const ProductItem = ({ product, props, type }) => {
+const ProductItem = ({ product, props, type, updateProductData }) => {
   
   const [isChecked, setIsChecked] = useState(false); 
 
@@ -24,9 +24,15 @@ const ProductItem = ({ product, props, type }) => {
       propsData: {
         type: type,
         product: product,
+        updateProductData: updateProductData,
       },
     });
   };
+
+  const statusStyles = [
+    styles.statusStyles,
+    product.status == 'active' ? styles.activeStatusStyles : styles.pauseStatusStyles,
+  ];
 
   return (
     <View style={styles.container}>
@@ -46,6 +52,9 @@ const ProductItem = ({ product, props, type }) => {
             <Image source={{uri : product.image1}} style={styles.imageStyles} />
           </TouchableOpacity>
         </View>
+        {(type === 'myProducts') && (
+          <Text style={statusStyles}>{product.status}</Text>
+        )}
         <View style={styles.textWrapper}>
           <View style={styles.nameWrapper}>
             <TouchableOpacity onPress={handleTouchableOpacityPress} style={styles.nameTO}>
@@ -65,7 +74,7 @@ const ProductItem = ({ product, props, type }) => {
 
           <View>
             <Text style={styles.priceStyles}>Rs.{product.price}</Text>
-            {(type === 'myProducts')?(
+            {(type === 'myProducts') && (
               <View style={styles.qtyWrapper}>
                 <Text style={styles.qtyStyles}>Avb Qty: {product.qty}</Text>
                 <View
@@ -85,7 +94,7 @@ const ProductItem = ({ product, props, type }) => {
                   ></View>
                 </View>
               </View>
-            ) : null }
+            )}
           </View>
         </View>
       </View>
@@ -128,6 +137,29 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
     borderRadius: 8,
+    backgroundColor: colors.gray,
+  },
+  statusStyles: {
+    position: 'absolute',
+    zIndex: 10,
+    left: 10,
+    top: 10,
+  },
+  activeStatusStyles: {
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    backgroundColor: colors.green,
+    color: colors.textLight,
+    fontWeight: 'bold',
+    borderRadius: 10,
+  },
+  pauseStatusStyles: {
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    backgroundColor: colors.red,
+    color: colors.textLight,
+    fontWeight: 'bold',
+    borderRadius: 10,
   },
   textWrapper: {
     flex: 3,

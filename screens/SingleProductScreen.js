@@ -9,12 +9,15 @@ import {
   Image,
   ScrollView,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { Ionicons, MaterialCommunityIcons } from 'react-native-vector-icons';
 import colors from '../assets/colors/colors';
 import Footer from '../components/footer/Footer';
+import { deleteProduct, pauseProduct, activateProduct } from '../assets/data/product';
 
 const SingleProductScreen = ({ route }) => {
-  const { propsData } = route.params;
+  const { propsData, updateProductData } = route.params;
+  const navigation = useNavigation();
 
   const [isLoading, setIsLoading] = useState(true);
   const [productData, setProductData] = useState([]);
@@ -26,18 +29,66 @@ const SingleProductScreen = ({ route }) => {
     setIsLoading(false);
   }, []);
 
-  const handleDelete = () => {
-    console.log('Delete')
+  const handleUpdateProduct = (d) => {
+    setProductData((prevProductData) => ({
+      ...prevProductData,
+      id : d.id,
+      name : d.name,
+      desc : d.desc,
+      price : d.price,
+      qty : d.qty,
+    }))
+    //check here
+    //updateProductData(d);
   }
 
-  const handleEdit = () => {
+  const handleEdit = async () => {
     console.log('Edit')
+    navigation.navigate('Edit Product', { productData : productData , updateProductData: handleUpdateProduct  });
   }
 
-  const handleStatus = (currentStatus) => {
-    console.log('Change Status - ',currentStatus)
-  }
-
+  const handleAction = async (status) => {
+    setIsLoading(true);
+  
+    try {
+      let res;
+      if (status === 'delete') {
+        res = await deleteProduct(productData.id);
+        console.log('Delete');
+      } else if (status === 'active') {
+        res = await activateProduct(productData.id);
+        console.log('Activate');
+      } else if (status === 'pause') {
+        res = await pauseProduct(productData.id);
+        console.log('Pause');
+      }
+  
+      if (res) {
+        setProductData((prevProductData) => ({
+          ...prevProductData,
+          status: status,
+        }));
+        updateProductData(productData.id, status);
+      } else {
+        console.log(`${status} failed`);
+      }
+    } catch (error) {
+      console.log('An error occurred:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const handleDelete = async () => {
+    await handleAction('delete');
+    navigation.goBack();
+  };
+  
+  const handleStatus = () => {
+    const newStatus = productData.status === 'active' ? 'pause' : 'active';
+    handleAction(newStatus);
+  };
+  
   const changeMainImage = (image) => {
     setMainImage(image);
   };
@@ -84,6 +135,7 @@ const SingleProductScreen = ({ route }) => {
           <View style={styles.bottomWrapper}>
             <Text style={styles.nameStyle}>{name}</Text>
             <View style={styles.priceWrapper}>
+            {propsData.type === 'myProducts' && (
               <View style={styles.qtyWrapper}>
                 <View style={styles.stockTextWrapper}>
                   <View style={[styles.dotStyle, { backgroundColor: stockColor }]}></View>
@@ -93,6 +145,7 @@ const SingleProductScreen = ({ route }) => {
                 </View>
                 <Text style={styles.qtyStyle}>Avb Qty : {qty}</Text>
               </View>
+            )}
               <Text style={styles.priceStyle}>Rs.{parseFloat(price).toFixed(2)}</Text>
             </View>
             <Text style={styles.descStyle}>{desc}</Text>
@@ -111,7 +164,7 @@ const SingleProductScreen = ({ route }) => {
                 color={colors.secondary}
               />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.bottomButtonStyles} onPress={handleStatus(status)}>
+            <TouchableOpacity style={styles.bottomButtonStyles} onPress={handleStatus}>
               <Ionicons name={status === 'active' ? 'md-pause-circle' : 'md-play-circle'} size={24} color={colors.secondary} />
             </TouchableOpacity>
           </View>
@@ -181,6 +234,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     borderColor: colors.gray,
+    backgroundColor: colors.gray,
   },
   smallImageWrapper: {
     flexDirection: 'row',
@@ -193,6 +247,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderWidth: 1,
     borderColor: colors.gray,
+    backgroundColor: colors.gray,
   },
   bottomWrapper: {
     flex: 1,

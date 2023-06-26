@@ -1,27 +1,25 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+const getLogData = async () => {
+  const data = await AsyncStorage.getItem('log_data');
+  if (!data) {
+    throw new Error('log_data does not exist in AsyncStorage (user.js)');
+  }
+  return JSON.parse(data);
+};
+
 const addProduct = async (formData) => {
   try {
-    const data = await AsyncStorage.getItem('log_data');
-
-    if (!data) {
-      console.log('log_data does not exist in AsyncStorage (user.js)');
-      return { payload: "Error", ref: "", stt: "error" };
-    }
-
-    const logData = JSON.parse(data);
-    const userToken = logData.log_userToken;
-    const userPhone = logData.log_userNumber;
-    const userType = logData.log_userType;
-
+    const logData = await getLogData();
+    const { log_userToken, log_userNumber, log_userType } = logData;
     const url = 'https://v2.genzo.lk/App_api/saveProducts';
 
-    const headers = new Headers({
+    const headers = {
       'Content-Type': 'multipart/form-data',
-      userToken: userToken,
-      userPhone: userPhone,
-      userType: userType,
-    });
+      userToken: log_userToken,
+      userPhone: log_userNumber,
+      userType: log_userType,
+    };
 
     const options = {
       method: 'POST',
@@ -29,35 +27,28 @@ const addProduct = async (formData) => {
       body: formData,
     };
 
-    console.log('save product run')
     const response = await fetch(url, options);
     const responseData = await response.json();
     return responseData;
   } catch (error) {
     console.error(error);
-    return { payload: "Error", ref: "", stt: "error" };
+    throw new Error('Error occurred while adding a product');
   }
 };
 
-
 const getProducts = async (type) => {
   try {
-    const data = await AsyncStorage.getItem('log_data');
-
-    if (!data) {
-      console.log('log_data does not exist in AsyncStorage (user.js)');
-      return { payload: "Error", ref: "", stt: "error" };
-    }
-
-    const logData = JSON.parse(data);
+    const logData = await getLogData();
     const { log_userToken, log_userNumber, log_userType } = logData;
-
-    const url = type === 'myProducts' ? 'https://v2.genzo.lk/App_api/getMyProducts' : 'https://v2.genzo.lk/App_api/getAllProducts';
+    const url =
+      type === 'myProducts'
+        ? 'https://v2.genzo.lk/App_api/getMyProducts'
+        : 'https://v2.genzo.lk/App_api/getAllProducts';
 
     const headers = {
-      'userToken': log_userToken,
-      'userPhone': log_userNumber,
-      'userType': log_userType
+      userToken: log_userToken,
+      userPhone: log_userNumber,
+      userType: log_userType,
     };
 
     const options = {
@@ -66,14 +57,64 @@ const getProducts = async (type) => {
     };
 
     const response = await fetch(url, options);
-    const json = await response.json();
-    // console.log(json);
-    return json;
+    const responseData = await response.json();
+    return responseData;
   } catch (error) {
     console.error(error);
-    return { payload: "Error", ref: "", stt: "error" };
+    throw new Error('Error occurred while getting products');
   }
 };
 
+const performProductAction = async (url, proId) => {
+  try {
+    const logData = await getLogData();
+    const { log_userToken, log_userNumber, log_userType } = logData;
 
-export {addProduct, getProducts, }
+    const headers = {
+      'Content-Type': 'multipart/form-data',
+      userToken: log_userToken,
+      userPhone: log_userNumber,
+      userType: log_userType,
+    };
+
+    const formData = new FormData();
+    formData.append('proId', proId);
+
+    const options = {
+      method: 'POST',
+      headers: headers,
+      body: formData,
+    };
+
+    const response = await fetch(url, options);
+    const responseData = await response.json();
+    console.log(responseData)
+    return responseData;
+  } catch (error) {
+    console.error(error);
+    throw new Error('Error occurred while performing the product action');
+  }
+};
+
+const pauseProduct = async (proId) => {
+  const url = 'https://v2.genzo.lk/App_api/pauseProducts';
+  return performProductAction(url, proId);
+};
+
+const activateProduct = async (proId) => {
+  const url = 'https://v2.genzo.lk/App_api/activateProducts';
+  return performProductAction(url, proId);
+};
+
+const deleteProduct = async (proId) => {
+  const url = 'https://v2.genzo.lk/App_api/deleteProducts';
+  return performProductAction(url, proId);
+};
+
+export {
+  addProduct,
+  getProducts,
+  pauseProduct,
+  activateProduct,
+  deleteProduct
+};

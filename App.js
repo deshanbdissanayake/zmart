@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { Keyboard } from 'react-native';
@@ -43,7 +43,7 @@ function App() {
       .then((data) => {
         if (data) {
           const logData = JSON.parse(data);
-          setLogData(logData)
+          setLogData(logData);
         } else {
           console.log('log_data does not exist in AsyncStorage')
         }

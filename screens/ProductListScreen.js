@@ -44,6 +44,7 @@ const ProductListScreen = ({ route }) => {
     setIsLoading(true);
     try {
       const response = await getProducts(propsData.type);
+      //console.log(response)
       setProducts(response);
       setPrevProducts(response);
     } catch (error) {
@@ -52,6 +53,36 @@ const ProductListScreen = ({ route }) => {
       setIsLoading(false);
     }
   };
+
+  const updateProductData = (data) => {
+    setProducts((prevProducts) =>
+      prevProducts.map((product) =>
+        product.id === data.id ? { 
+          ...product, 
+          id : data.id,
+          name : data.name,
+          desc : data.desc,
+          price : data.price,
+          qty : data.qty,
+          status: data.status,
+        } : product
+      )
+    );
+    setPrevProducts((prevProducts) =>
+      prevProducts.map((product) =>
+        product.id === data.id ? { 
+          ...product, 
+          id : data.id,
+          name : data.name,
+          desc : data.desc,
+          price : data.price,
+          qty : data.qty,
+          status: data.status,
+        } : product
+      )
+    )
+  };
+  
 
   const handleSearch = (text) => {
     if (text.length > 0) {
@@ -145,10 +176,15 @@ const ProductListScreen = ({ route }) => {
         </View>
 
         <FlatList
-          data={products}
+          data={products.filter(item => item.status !== 'delete')}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item }) => (
-            <ProductItem product={item} props={propsForItems} type={propsData.type} />
+            <ProductItem
+              product={item}
+              props={propsForItems}
+              type={propsData.type}
+              updateProductData={updateProductData}
+            />
           )}
           showsVerticalScrollIndicator={false}
           refreshControl={ // Adding RefreshControl
