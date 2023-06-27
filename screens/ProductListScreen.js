@@ -85,27 +85,30 @@ const ProductListScreen = ({ route }) => {
   };  
 
   const handleShareBtnClick = () => {
-    setPropsForItems({
+    console.log('share btn click')
+    /*setPropsForItems({
       ...propsForItems,
       shareBtnClicked: true,
     });
-    setProListTitle('Share My Products');
+    setProListTitle('Share My Products');*/
   };
 
   const handleInvoiceBtnClick = () => {
-    setPropsForItems({
+    console.log('invoice btn click')
+    /*setPropsForItems({
       ...propsForItems,
       invoiceBtnClicked: true,
     });
-    setProListTitle('Invoice My Products');
+    setProListTitle('Invoice My Products');*/
   };
 
   const handleStockBtnClick = () => {
-    setPropsForItems({
+    console.log('stock btn click')
+    /*setPropsForItems({
       ...propsForItems,
       stockBtnClicked: true,
     });
-    setProListTitle('My Products Stock Update');
+    setProListTitle('My Products Stock Update');*/
   };
 
   const handleCancelBtnClick = () => {
