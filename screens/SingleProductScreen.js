@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  Alert
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons, MaterialCommunityIcons } from 'react-native-vector-icons';
@@ -38,13 +39,13 @@ const SingleProductScreen = ({ route }) => {
       price : d.price,
       qty : d.qty,
     }))
-    //check here
-    //updateProductData(d);
+    
+    updateProductData(d);
   }
 
   const handleEdit = async () => {
     console.log('Edit')
-    navigation.navigate('Edit Product', { productData : productData , updateProductData: handleUpdateProduct  });
+    navigation.navigate('Edit Product', { productData: productData, updateProductData: handleUpdateProduct });
   }
 
   const handleAction = async (status) => {
@@ -68,8 +69,24 @@ const SingleProductScreen = ({ route }) => {
           ...prevProductData,
           status: status,
         }));
-        updateProductData(productData.id, status);
+
+        let msg;
+        if (status === 'delete') {
+          msg = 'Product deleted successfully!';
+        } else {
+          msg = 'Product status changed to ' + status + ' successfully!';
+        }
+
+        Alert.alert('Success', msg, [
+          { text: 'OK', onPress: () => console.log('OK Pressed') },
+        ]);
+
+
+        updateProductData({id: productData.id, status: status});
       } else {
+        Alert.alert('Error', 'Failed to change product status.', [
+          { text: 'OK', onPress: () => console.log('OK Pressed') },
+        ]);
         console.log(`${status} failed`);
       }
     } catch (error) {
@@ -78,16 +95,49 @@ const SingleProductScreen = ({ route }) => {
       setIsLoading(false);
     }
   };
-  
+
   const handleDelete = async () => {
-    await handleAction('delete');
-    navigation.goBack();
+    Alert.alert(
+      'Confirm Delete',
+      'Are you sure you want to delete this product?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            await handleAction('delete');
+            navigation.goBack();
+          },
+        },
+      ]
+    );
   };
+
   
   const handleStatus = () => {
     const newStatus = productData.status === 'active' ? 'pause' : 'active';
-    handleAction(newStatus);
+    
+    // Show an alert to confirm the action
+    Alert.alert(
+      'Confirmation',
+      `Are you sure you want to ${newStatus} this product?`,
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Confirm',
+          onPress: () => handleAction(newStatus),
+        },
+      ],
+    );
   };
+  
   
   const changeMainImage = (image) => {
     setMainImage(image);
@@ -155,9 +205,11 @@ const SingleProductScreen = ({ route }) => {
         {propsData.type === 'myProducts' ? (
           <View style={styles.bottomButtonsWrapper}>
             <TouchableOpacity style={styles.bottomButtonStyles} onPress={handleDelete}>
+            <Text style={styles.bottomButtonText}>Delete</Text>
               <Ionicons name="trash-bin" size={24} color={colors.red} />
             </TouchableOpacity>
             <TouchableOpacity style={styles.bottomButtonStyles} onPress={handleEdit}>
+              <Text style={styles.bottomButtonText}>Edit</Text>
               <MaterialCommunityIcons
                 name="circle-edit-outline"
                 size={24}
@@ -165,6 +217,7 @@ const SingleProductScreen = ({ route }) => {
               />
             </TouchableOpacity>
             <TouchableOpacity style={styles.bottomButtonStyles} onPress={handleStatus}>
+              <Text style={styles.bottomButtonText}>{status === 'active' ? 'Pause' : 'Activate'}</Text>
               <Ionicons name={status === 'active' ? 'md-pause-circle' : 'md-play-circle'} size={24} color={colors.secondary} />
             </TouchableOpacity>
           </View>
@@ -230,7 +283,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     height: '100%',
-    resizeMode: 'cover',
+    resizeMode: 'contain',
     borderRadius: 10,
     borderWidth: 1,
     borderColor: colors.gray,
@@ -243,7 +296,7 @@ const styles = StyleSheet.create({
   smallImageStyles: {
     width: 100,
     height: 80,
-    resizeMode: 'cover',
+    resizeMode: 'contain',
     borderRadius: 5,
     borderWidth: 1,
     borderColor: colors.gray,
@@ -311,6 +364,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     flexDirection: 'row',
+  },
+  bottomButtonText: {
+    marginRight: 10,
+    fontWeight: 'bold',
+    color: colors.white,
+    fontSize: 12,
   },
 });
 

@@ -24,14 +24,14 @@ const ProductItem = ({ product, props, type, updateProductData }) => {
       propsData: {
         type: type,
         product: product,
-        updateProductData: updateProductData,
       },
+      updateProductData: updateProductData,
     });
   };
 
   const statusStyles = [
     styles.statusStyles,
-    product.status == 'active' ? styles.activeStatusStyles : styles.pauseStatusStyles,
+    product.admin_status === 'active' ? (product.status === 'active' ? styles.activeStatusStyles : styles.pauseStatusStyles) : styles.pauseStatusStyles
   ];
 
   return (
@@ -53,7 +53,7 @@ const ProductItem = ({ product, props, type, updateProductData }) => {
           </TouchableOpacity>
         </View>
         {(type === 'myProducts') && (
-          <Text style={statusStyles}>{product.status}</Text>
+          <Text style={statusStyles}>{ product.admin_status == 'active' ? product.status : 'Pending Approval' }</Text>
         )}
         <View style={styles.textWrapper}>
           <View style={styles.nameWrapper}>
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
   imageStyles: {
     width: '100%',
     height: '100%',
-    resizeMode: 'cover',
+    resizeMode: 'contain',
     borderWidth: 1,
     borderColor: colors.border,
     borderRadius: 8,
@@ -151,7 +151,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.green,
     color: colors.textLight,
     fontWeight: 'bold',
-    borderRadius: 10,
+    borderRadius: 5,
+    fontSize: 10,
   },
   pauseStatusStyles: {
     paddingVertical: 5,
@@ -159,7 +160,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.red,
     color: colors.textLight,
     fontWeight: 'bold',
-    borderRadius: 10,
+    borderRadius: 5,
+    fontSize: 10,
   },
   textWrapper: {
     flex: 3,

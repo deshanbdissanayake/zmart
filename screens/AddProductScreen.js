@@ -17,7 +17,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { addProduct } from '../assets/data/product';
 
 const AddProductScreen = ({ route, navigation }) => {
-  const { productData, updateProductData } = route.params;
+  const { productData, updateProductData } = route.params || {};
   //console.log(productData);
   
   const [newProductData, setNewProductData] = useState({
@@ -137,22 +137,26 @@ const AddProductScreen = ({ route, navigation }) => {
         formData.append('proQty', proQty);
   
         const response = await addProduct(formData); // Call addProduct with the newProductData
-        console.log('check2')
+        //console.log('check2')
 
         console.log(response);
   
         let msg = proId != '' ? 'Updated' : 'Added'
 
         if (response.stt === 'ok') {
-          
+
           Alert.alert('Success', 'Product '+msg+' successfully!', [
             { text: 'OK', onPress: () => console.log('OK Pressed') },
           ]);
+          
           handleReset();
+
         } else {
+
           Alert.alert('Error', 'Failed to '+msg+' product.', [
             { text: 'OK', onPress: () => console.log('OK Pressed') },
           ]);
+
         }
       } catch (error) {
         Alert.alert('Error', 'Failed to add/update product try.');
@@ -163,15 +167,16 @@ const AddProductScreen = ({ route, navigation }) => {
   };
   
 
-  const handleReset = async () => {
-    if(proId != ''){
+  const handleReset = () => {
+    if(proId !== ''){
       updateProductData({
-          id : proId,
-          name : proName,
-          desc : proDesc,
-          price : proPrice,
-          qty : proQty,
-        })
+        id: proId,
+        name: proName,
+        desc: proDesc,
+        price: proPrice,
+        qty: proQty,
+        admin_status: 'stop',
+      });
       navigation.goBack();
     }else{
       setNewProductData({
@@ -314,10 +319,12 @@ const AddProductScreen = ({ route, navigation }) => {
 
             <View style={styles.bottomButtonsWrapper}>
               <TouchableOpacity style={styles.bottomButtonStyles} onPress={handleReset}>
+                <Text style={styles.bottomButtonText}>Cancel</Text>
                 <MaterialCommunityIcons name="cancel" size={24} color={colors.red} />
               </TouchableOpacity>
 
               <TouchableOpacity style={styles.bottomButtonStyles} onPress={handleButtonClick}>
+                <Text style={styles.bottomButtonText}>{ proId !== '' ? 'Edit' : 'Save' }</Text>
                 <Entypo name="circle-with-plus" size={24} color={colors.secondary} />
               </TouchableOpacity>
             </View>
@@ -373,6 +380,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     flexDirection: 'row',
+  },
+  bottomButtonText: {
+    marginRight: 10,
+    fontWeight: 'bold',
+    color: colors.white,
+    fontSize: 12,
   },
   singleImage: {
     width: 90,

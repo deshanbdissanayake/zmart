@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }) => {
       const data = await AsyncStorage.getItem('log_data');
       if (data) {
         const logData = JSON.parse(data);
-        console.log(logData)
+        //console.log(logData)
         const checkUser = await validateUser(logData.log_userNumber, logData.log_userToken, logData.log_userType);
         if (checkUser) {
           console.log('Valid user');

@@ -1,20 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  ActivityIndicator,
-  SafeAreaView,
-  TextInput,
-  TouchableOpacity,
-  RefreshControl,
-} from 'react-native';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, SafeAreaView, TextInput, TouchableOpacity, RefreshControl } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from 'react-native-vector-icons';
 
 import colors from '../assets/colors/colors';
 import Footer from '../components/footer/Footer';
 import ProductItem from '../components/products/ProductItem';
+
 import { getProducts } from '../assets/data/product';
 
 const ProductListScreen = ({ route }) => {
@@ -29,12 +20,22 @@ const ProductListScreen = ({ route }) => {
   const [selectedCount, setSelectedCount] = useState(0);
   const [refreshing, setRefreshing] = useState(false); // State for refresh control
 
+  const checkCountFunc = (n) => {
+    console.log(n);
+    if (n === 0) {
+      setSelectedCount(0);
+    } else {
+      setSelectedCount(selectedCount + parseInt(n));
+    }
+  };
+  
   const [propsForItems, setPropsForItems] = useState({
     shareBtnClicked: false,
     invoiceBtnClicked: false,
     stockBtnClicked: false,
     checkCountFunc: checkCountFunc,
   });
+  
 
   useEffect(() => {
     fetchProducts();
@@ -55,52 +56,33 @@ const ProductListScreen = ({ route }) => {
   };
 
   const updateProductData = (data) => {
+    console.log('productlist', data);
+    
     setProducts((prevProducts) =>
       prevProducts.map((product) =>
         product.id === data.id ? { 
           ...product, 
-          id : data.id,
-          name : data.name,
-          desc : data.desc,
-          price : data.price,
-          qty : data.qty,
-          status: data.status,
+          ...data
         } : product
       )
     );
+  
     setPrevProducts((prevProducts) =>
       prevProducts.map((product) =>
         product.id === data.id ? { 
           ...product, 
-          id : data.id,
-          name : data.name,
-          desc : data.desc,
-          price : data.price,
-          qty : data.qty,
-          status: data.status,
+          ...data
         } : product
       )
-    )
+    );
+  
+    console.log('update');
   };
   
-
   const handleSearch = (text) => {
-    if (text.length > 0) {
-      const filteredProducts = products.filter((product) => product.name.includes(text));
-      setProducts(filteredProducts);
-    } else {
-      setProducts(prevProducts);
-    }
-  };
-
-  const checkCountFunc = (n) => {
-    console.log(n);
-    if (n == 0) {
-      setSelectedCount(0);
-    } else {
-      setSelectedCount(selectedCount + parseInt(n));
-    }
-  };
+    const filteredProducts = text.length > 0 ? products.filter((product) => product.name.includes(text)) : prevProducts;
+    setProducts(filteredProducts);
+  };  
 
   const handleShareBtnClick = () => {
     setPropsForItems({
@@ -172,7 +154,7 @@ const ProductListScreen = ({ route }) => {
       <View style={styles.proListWrapper}>
         <View style={styles.proListTitleWrapper}>
           <Text style={styles.proListTitle}>{proListTitle}</Text>
-          {selectedCount > 0 ? <Text>{selectedCount} Selected</Text> : ''}
+          {selectedCount > 0 ? <Text>{selectedCount} Selected</Text> : null} 
         </View>
 
         <FlatList
@@ -202,20 +184,20 @@ const ProductListScreen = ({ route }) => {
               style={styles.bottomButtonStyles}
               onPress={handleCancelBtnClick}
             >
-              {/*<Text style={styles.bottomButtonText}>Cancel</Text>*/}
+              <Text style={styles.bottomButtonText}>Cancel</Text>
               <Ionicons name="close" size={24} color={colors.red} />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.bottomButtonStyles}
               onPress={handleNextBtnClick}
             >
-              {/*<Text style={styles.bottomButtonText}>
+              <Text style={styles.bottomButtonText}>
                 {propsForItems.shareBtnClicked
                   ? 'Share'
                   : propsForItems.invoiceBtnClicked
                   ? 'Invoice'
                   : 'Stock'}
-              </Text>*/}
+              </Text>
               {propsForItems.shareBtnClicked ? (
                 <Ionicons
                   name="share-social-sharp"
@@ -243,7 +225,7 @@ const ProductListScreen = ({ route }) => {
               style={styles.bottomButtonStyles}
               onPress={handleStockBtnClick}
             >
-              {/*<Text style={styles.bottomButtonText}>Stock</Text>*/}
+              <Text style={styles.bottomButtonText}>Stock</Text>
               <MaterialCommunityIcons
                 name="format-list-bulleted"
                 size={24}
@@ -254,7 +236,7 @@ const ProductListScreen = ({ route }) => {
               style={styles.bottomButtonStyles}
               onPress={handleShareBtnClick}
             >
-              {/*<Text style={styles.bottomButtonText}>Share</Text>*/}
+              <Text style={styles.bottomButtonText}>Share</Text>
               <Ionicons
                 name="share-social-sharp"
                 size={24}
@@ -265,7 +247,7 @@ const ProductListScreen = ({ route }) => {
               style={styles.bottomButtonStyles}
               onPress={handleInvoiceBtnClick}
             >
-              {/*<Text style={styles.bottomButtonText}>Invoice</Text>*/}
+              <Text style={styles.bottomButtonText}>Invoice</Text>
               <MaterialCommunityIcons
                 name="file-document-outline"
                 size={24}
@@ -354,6 +336,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
     fontWeight: 'bold',
     color: colors.white,
+    fontSize: 12,
   },
 });
 
