@@ -84,13 +84,13 @@ const AddProductScreen = ({ route, navigation }) => {
       errors.proDescError = true;
     }
   
-    if (proPrice.trim() === '') {
+    if (proPrice.trim() === '' || parseFloat(proPrice) < 0) {
       errors.proPriceError = true;
     }
-  
-    if (proQty.trim() === '') {
+    
+    if (proQty.trim() === '' || parseFloat(proQty) < 0) {
       errors.proQtyError = true;
-    }
+    }    
   
     if (image1 === '') {
       errors.image1Error = true;
@@ -310,7 +310,7 @@ const AddProductScreen = ({ route, navigation }) => {
 
                   {(formErrors.proPriceError || formErrors.proQtyError) && (
                     <View style={styles.errorWrapper}>
-                      <Text style={styles.errorMessage}>Product Price & Qty field is required!</Text>
+                      <Text style={styles.errorMessage}>Check Product Price & Qty fields!</Text>
                     </View>
                   )}
                 </View>
