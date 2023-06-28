@@ -72,6 +72,7 @@ const AddProductScreen = ({ route, navigation }) => {
       [key]: value,
     }));
   };
+  
 
   const handleButtonClick = async () => {
     const errors = {};
@@ -88,9 +89,9 @@ const AddProductScreen = ({ route, navigation }) => {
       errors.proPriceError = true;
     }
     
-    if (proQty.trim() === '' || parseFloat(proQty) < 0) {
+    if (proQty.trim() === '' || parseInt(proQty) < 0 || proQty.includes('.')) {
       errors.proQtyError = true;
-    }    
+    }     
   
     if (image1 === '') {
       errors.image1Error = true;

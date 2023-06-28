@@ -15,6 +15,7 @@ import { FontAwesome5, Ionicons } from 'react-native-vector-icons';
 
 // Import your screens or components
 import ProListNav from './ProListNav';
+import OrdListNav from './OrdListNav';
 import MyProListNav from './MyProListNav';
 import AddProductScreen from '../screens/AddProductScreen';
 import colors from '../assets/colors/colors';
@@ -84,6 +85,11 @@ const HomeNav = () => {
       <Drawer.Screen
         name="My Products"
         component={MyProListNav}
+        options={{ headerShown: false }}
+      />
+      <Drawer.Screen
+        name="My Orders"
+        component={OrdListNav}
         options={{ headerShown: false }}
       />
       <Drawer.Screen
