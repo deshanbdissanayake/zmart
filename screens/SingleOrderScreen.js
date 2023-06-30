@@ -1,58 +1,70 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, TextInput, Image, ScrollView } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image, ScrollView, Alert } from 'react-native';
 import { AntDesign, Feather, Ionicons, Fontisto } from 'react-native-vector-icons';
 import colors from '../assets/colors/colors';
 
 const Item = ({ orderData, refresh }) => {
   const { ord_qty, pro_img, pro_name, ord_price } = orderData;
-  const originalQty = parseInt(ord_qty).toString();
-  const [qty, setQty] = useState(originalQty);
+  const [qty, setQty] = useState(ord_qty.toString());
+
+  const [order, setOrder] = useState(orderData)
 
   useEffect(() => {
-    setQty(originalQty);
+    setQty(ord_qty.toString());
+    setOrder(orderData);
   }, [refresh]);
 
-  const handleIncreaseQty = () => {
-    setQty((prevQty) => {
-      const qtyAmt = parseInt(prevQty);
-      return (qtyAmt + 1).toString();
-    });
+  const handleQty = (text) => {
+    const ord_qty = text;
+    setQty(ord_qty);
+    setOrder((prev) => ({ ...prev, ord_qty }));
   };
   
-  const handleDecreaseQty = () => {
+  const handleIncreaseQty = useCallback(() => {
     setQty((prevQty) => {
-      const qtyAmt = parseInt(prevQty);
-      if (qtyAmt <= 0) {
-        return '0';
-      } else {
-        return (qtyAmt - 1).toString();
-      }
+      const qtyAmt = parseInt(prevQty) + 1;
+      setOrder((prev) => ({ ...prev, ord_qty: qtyAmt.toString() }));
+      return qtyAmt.toString();
     });
-  };
+  }, []);
   
+  const handleDecreaseQty = useCallback(() => {
+    setQty((prevQty) => {
+      const qtyAmt = parseInt(prevQty) - 1;
+      const newQty = qtyAmt >= 0 ? qtyAmt.toString() : '0';
+      setOrder((prev) => ({ ...prev, ord_qty: newQty }));
+      return newQty;
+    });
+  }, []);  
 
   return (
     <View style={styles.itemCardWrapper}>
       <Image source={pro_img} style={styles.itemCardImgStyles} />
       <View style={styles.itemCardTextStyles}>
-        <Text style={styles.itemCardNameStyles} numberOfLines={2}>{pro_name}</Text>
-        <Text style={styles.itemCardPriceStyles}>LKR {(parseFloat(ord_price)).toFixed(2)}</Text>
+        <Text style={styles.itemCardNameStyles} numberOfLines={2}>
+          {pro_name}
+        </Text>
+        <Text style={styles.itemCardPriceStyles}>LKR {parseFloat(ord_price).toFixed(2)}</Text>
       </View>
       <View style={styles.itemCardQtyStyles}>
-        <TouchableOpacity onPress={handleIncreaseQty} ><AntDesign name="caretup" size={20} color="black" /></TouchableOpacity>
+        <TouchableOpacity onPress={handleIncreaseQty}>
+          <AntDesign name="caretup" size={20} color="black" />
+        </TouchableOpacity>
         <TextInput
           value={qty}
-          onChange={() => {}}
+          onChangeText={handleQty}
           style={styles.inputStyle}
-          keyboardType='number-pad'
+          keyboardType="number-pad"
         />
-        <TouchableOpacity onPress={handleDecreaseQty} ><AntDesign name="caretdown" size={20} color="black" /></TouchableOpacity>
+        <TouchableOpacity onPress={handleDecreaseQty}>
+          <AntDesign name="caretdown" size={20} color="black" />
+        </TouchableOpacity>
       </View>
     </View>
   );
 };
 
-const SingleOrderScreen = ({ route }) => {
+const SingleOrderScreen = ({ navigation, route }) => {
   const { order } = route.params;
   const orderItems = order.order_items;
   const [refresh, setRefresh] = useState(0);
@@ -62,7 +74,24 @@ const SingleOrderScreen = ({ route }) => {
   };
 
   const handleConfirm = () => {
-    console.log('confirm');
+    Alert.alert(
+      'Confirm the Order',
+      'Are you sure you want to confirm?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Confirm',
+          onPress: () => {
+            console.log('confirm');
+            navigation.goBack();
+          },
+        },
+      ],
+      { cancelable: false }
+    );
   };
 
   const handleCallPress = () => {
