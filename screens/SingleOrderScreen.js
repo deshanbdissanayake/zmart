@@ -3,23 +3,26 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image, ScrollView,
 import { AntDesign, Feather, Ionicons, Fontisto } from 'react-native-vector-icons';
 import colors from '../assets/colors/colors';
 
-const Item = ({ orderData, refresh }) => {
+const Item = ({ orderData, refresh, updateTotal  }) => {
   const { ord_qty, pro_img, pro_name, ord_price } = orderData;
   const [qty, setQty] = useState(ord_qty.toString());
-
-  const [order, setOrder] = useState(orderData)
+  const [order, setOrder] = useState(orderData);
 
   useEffect(() => {
     setQty(ord_qty.toString());
     setOrder(orderData);
   }, [refresh]);
 
+  useEffect(() => {
+    updateTotal(ord_price, ord_qty, qty);
+  }, [qty]);
+
   const handleQty = (text) => {
-    const ord_qty = text;
+    const ord_qty = text !== '' ? text : 0;
     setQty(ord_qty);
     setOrder((prev) => ({ ...prev, ord_qty }));
   };
-  
+
   const handleIncreaseQty = useCallback(() => {
     setQty((prevQty) => {
       const qtyAmt = parseInt(prevQty) + 1;
@@ -27,7 +30,7 @@ const Item = ({ orderData, refresh }) => {
       return qtyAmt.toString();
     });
   }, []);
-  
+
   const handleDecreaseQty = useCallback(() => {
     setQty((prevQty) => {
       const qtyAmt = parseInt(prevQty) - 1;
@@ -35,7 +38,7 @@ const Item = ({ orderData, refresh }) => {
       setOrder((prev) => ({ ...prev, ord_qty: newQty }));
       return newQty;
     });
-  }, []);  
+  }, []);
 
   return (
     <View style={styles.itemCardWrapper}>
@@ -68,6 +71,41 @@ const SingleOrderScreen = ({ navigation, route }) => {
   const { order } = route.params;
   const orderItems = order.order_items;
   const [refresh, setRefresh] = useState(0);
+  const [totalAmount, setTotalAmount] = useState(0.00);
+  const [initialTotalAmount, setInitialTotalAmount] = useState(0.00);
+
+  const updateTotalAmount = useCallback((price, oldQty, newQty) => {
+    const initialTotal = initialTotalAmount;
+    const parsedPrice = parseFloat(price);
+    const parsedOldQty = parseFloat(oldQty);
+    const parsedNewQty = parseFloat(newQty);
+
+    if (parsedOldQty !== parsedNewQty) {
+      const qtyDifference = parsedNewQty - parsedOldQty;
+      const amountDifference = parsedPrice * qtyDifference;
+      const total = initialTotal + amountDifference;
+
+      /*console.log('initialTotal = ', initialTotal)
+      console.log('total = ', total)
+      console.log('parsedPrice = ',parsedPrice)
+      console.log('parsedOldQty = ', parsedOldQty)
+      console.log('parsedNewQty = ',parsedNewQty)*/
+
+
+      setTotalAmount(total);
+    }
+  }, [initialTotalAmount]);
+
+  useEffect(() => {
+    // Calculate the initial total amount
+    let initialTotal = 0.00;
+    orderItems.forEach((item) => {
+      initialTotal += parseFloat(item.ord_price) * parseFloat(item.ord_qty);
+    });
+    //console.log(initialTotal)
+    setTotalAmount(initialTotal);
+    setInitialTotalAmount(initialTotal);
+  }, []);
 
   const toggleRefresh = () => {
     setRefresh(prevStt => !prevStt);
@@ -103,6 +141,7 @@ const SingleOrderScreen = ({ navigation, route }) => {
   };
 
   return (
+    <>
     <ScrollView>
       <View style={styles.container}>
         <View style={styles.orderWrapper}>
@@ -136,27 +175,28 @@ const SingleOrderScreen = ({ navigation, route }) => {
             <Text style={styles.titleStyles}>Order Items</Text>
             <View>
               {orderItems.map((item) => (
-                <Item key={item.ordi_id} orderData={item} refresh={refresh} />
+                <Item key={item.ordi_id} orderData={item} refresh={refresh} updateTotal={updateTotalAmount} />
               ))}
             </View>
           </View>
           <View style={styles.totalWrapper}>
             <Text style={styles.totalTitle}>Total Amount </Text>
-            <Text style={styles.totalAmount}>1000.00</Text>
+            <Text style={styles.totalAmount}>LKR {totalAmount.toFixed(2)}</Text>
           </View>
         </View>
       </View>
-      <View style={styles.bottomButtonsWrapper}>
-        <TouchableOpacity style={styles.bottomButtonStyles} onPress={toggleRefresh}>
-          <Text style={styles.bottomButtonText}>Reset</Text>
-          <Fontisto name="undo" size={24} color={colors.red} />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.bottomButtonStyles} onPress={handleConfirm}>
-          <Text style={styles.bottomButtonText}>Confirm</Text>
-          <Ionicons name="checkmark-circle" size={24} color={colors.secondary} />
-        </TouchableOpacity>
-      </View>
     </ScrollView>
+    <View style={styles.bottomButtonsWrapper}>
+    <TouchableOpacity style={styles.bottomButtonStyles} onPress={toggleRefresh}>
+      <Text style={styles.bottomButtonText}>Reset</Text>
+      <Fontisto name="undo" size={24} color={colors.red} />
+    </TouchableOpacity>
+    <TouchableOpacity style={styles.bottomButtonStyles} onPress={handleConfirm}>
+      <Text style={styles.bottomButtonText}>Confirm</Text>
+      <Ionicons name="checkmark-circle" size={24} color={colors.secondary} />
+    </TouchableOpacity>
+  </View>
+  </>
   );
 };
 
