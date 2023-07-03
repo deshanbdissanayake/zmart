@@ -14,7 +14,8 @@ const Item = ({ orderData, refresh, updateTotal  }) => {
   }, [refresh]);
 
   useEffect(() => {
-    updateTotal(ord_price, ord_qty, qty);
+    const itemTotal = parseFloat(ord_price) * (parseFloat(qty) - parseFloat(ord_qty))
+    updateTotal(itemTotal);
   }, [qty]);
 
   const handleQty = (text) => {
@@ -74,27 +75,11 @@ const SingleOrderScreen = ({ navigation, route }) => {
   const [totalAmount, setTotalAmount] = useState(0.00);
   const [initialTotalAmount, setInitialTotalAmount] = useState(0.00);
 
-  const updateTotalAmount = useCallback((price, oldQty, newQty) => {
+  const updateTotalAmount = (itemTotal) => {
     const initialTotal = initialTotalAmount;
-    const parsedPrice = parseFloat(price);
-    const parsedOldQty = parseFloat(oldQty);
-    const parsedNewQty = parseFloat(newQty);
-
-    if (parsedOldQty !== parsedNewQty) {
-      const qtyDifference = parsedNewQty - parsedOldQty;
-      const amountDifference = parsedPrice * qtyDifference;
-      const total = initialTotal + amountDifference;
-
-      /*console.log('initialTotal = ', initialTotal)
-      console.log('total = ', total)
-      console.log('parsedPrice = ',parsedPrice)
-      console.log('parsedOldQty = ', parsedOldQty)
-      console.log('parsedNewQty = ',parsedNewQty)*/
-
-
-      setTotalAmount(total);
-    }
-  }, [initialTotalAmount]);
+    
+    setTotalAmount(initialTotal + itemTotal);
+  };
 
   useEffect(() => {
     // Calculate the initial total amount
