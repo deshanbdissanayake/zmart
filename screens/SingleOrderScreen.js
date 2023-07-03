@@ -14,9 +14,9 @@ const Item = ({ orderData, refresh, updateTotal  }) => {
   }, [refresh]);
 
   useEffect(() => {
-    const itemTotal = parseFloat(ord_price) * (parseFloat(qty) - parseFloat(ord_qty))
+    const itemTotal = parseFloat(ord_price) * (parseFloat(qty) - parseFloat(ord_qty));
     updateTotal(itemTotal);
-  }, [qty]);
+  }, [qty, ord_price, ord_qty, updateTotal]);
 
   const handleQty = (text) => {
     const ord_qty = text !== '' ? text : 0;
@@ -73,13 +73,10 @@ const SingleOrderScreen = ({ navigation, route }) => {
   const orderItems = order.order_items;
   const [refresh, setRefresh] = useState(0);
   const [totalAmount, setTotalAmount] = useState(0.00);
-  const [initialTotalAmount, setInitialTotalAmount] = useState(0.00);
 
-  const updateTotalAmount = (itemTotal) => {
-    const initialTotal = initialTotalAmount;
-    
-    setTotalAmount(initialTotal + itemTotal);
-  };
+  const updateTotalAmount = useCallback((itemTotal) => {
+    setTotalAmount((prevTotal) => prevTotal + itemTotal);
+  }, []);
 
   useEffect(() => {
     // Calculate the initial total amount
@@ -87,9 +84,7 @@ const SingleOrderScreen = ({ navigation, route }) => {
     orderItems.forEach((item) => {
       initialTotal += parseFloat(item.ord_price) * parseFloat(item.ord_qty);
     });
-    //console.log(initialTotal)
     setTotalAmount(initialTotal);
-    setInitialTotalAmount(initialTotal);
   }, []);
 
   const toggleRefresh = () => {
