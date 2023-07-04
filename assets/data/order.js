@@ -11,6 +11,7 @@ const getMyOrders = async () => {
         status: 'Pending',
         order_items: [
           {
+            ord_id: '001',
             ordi_id: '1',
             pro_id: 'P1',
             pro_name: 'Premium Ultra-Durable Stainless Steel 12-Cup Programmable Coffee Maker with Built-In Grinder and Brew Strength Selector',
@@ -21,6 +22,7 @@ const getMyOrders = async () => {
             ord_pcode: 'P001',
           },
           {
+            ord_id: '001',
             ordi_id: '2',
             pro_id: 'P1',
             pro_name: 'Professional Series 15.6-Inch Quad-Core Laptop with Retina Display, Touch Bar, and Enhanced Graphics',
@@ -31,6 +33,7 @@ const getMyOrders = async () => {
             ord_pcode: 'P001',
           },
           {
+            ord_id: '001',
             ordi_id: '3',
             pro_id: 'P1',
             pro_name: 'Advanced All-in-One Multi-Function Wireless Printer with Duplex Printing, Fax, Scan, and Copy Functions',
@@ -54,6 +57,7 @@ const getMyOrders = async () => {
         status: 'Completed',
         order_items: [
           {
+            ord_id: '002',
             ordi_id: 'OI3',
             pro_id: 'P3',
             pro_name: 'P1sdfasdf',
@@ -77,6 +81,7 @@ const getMyOrders = async () => {
         status: 'Processing',
         order_items: [
           {
+            ord_id: '003',
             ordi_id: 'OI4',
             pro_id: 'P4',
             pro_name: 'P1sdfasdf',

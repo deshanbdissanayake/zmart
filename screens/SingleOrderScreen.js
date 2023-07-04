@@ -3,31 +3,32 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image, ScrollView,
 import { AntDesign, Feather, Ionicons, Fontisto } from 'react-native-vector-icons';
 import colors from '../assets/colors/colors';
 
-const Item = ({ orderData, refresh, updateTotal  }) => {
+const Item = ({ orderData, refresh, setOrder }) => {
   const { ord_qty, pro_img, pro_name, ord_price } = orderData;
   const [qty, setQty] = useState(ord_qty.toString());
-  const [order, setOrder] = useState(orderData);
+  const [ord, setOrd] = useState(orderData);
+ 
+  //console.log('orderData', ord)
 
   useEffect(() => {
     setQty(ord_qty.toString());
-    setOrder(orderData);
+    setOrd(orderData);
   }, [refresh]);
 
   useEffect(() => {
-    const itemTotal = parseFloat(ord_price) * (parseFloat(qty) - parseFloat(ord_qty));
-    updateTotal(itemTotal);
-  }, [qty, ord_price, ord_qty, updateTotal]);
+    setOrder(ord)
+  },[qty, setOrder])
 
   const handleQty = (text) => {
-    const ord_qty = text !== '' ? text : 0;
-    setQty(ord_qty);
-    setOrder((prev) => ({ ...prev, ord_qty }));
+    const ordQty = text !== '' ? text.toString() : '0';
+    setQty(ordQty);
+    setOrd((prev) => ({ ...prev, ord_qty : ordQty }));
   };
 
   const handleIncreaseQty = useCallback(() => {
     setQty((prevQty) => {
       const qtyAmt = parseInt(prevQty) + 1;
-      setOrder((prev) => ({ ...prev, ord_qty: qtyAmt.toString() }));
+      setOrd((prev) => ({ ...prev, ord_qty: qtyAmt.toString() }));
       return qtyAmt.toString();
     });
   }, []);
@@ -36,7 +37,7 @@ const Item = ({ orderData, refresh, updateTotal  }) => {
     setQty((prevQty) => {
       const qtyAmt = parseInt(prevQty) - 1;
       const newQty = qtyAmt >= 0 ? qtyAmt.toString() : '0';
-      setOrder((prev) => ({ ...prev, ord_qty: newQty }));
+      setOrd((prev) => ({ ...prev, ord_qty: newQty }));
       return newQty;
     });
   }, []);
@@ -69,26 +70,51 @@ const Item = ({ orderData, refresh, updateTotal  }) => {
 };
 
 const SingleOrderScreen = ({ navigation, route }) => {
-  const { order } = route.params;
-  const orderItems = order.order_items;
-  const [refresh, setRefresh] = useState(0);
+  const orderItems = route.params.order;
+  //console.log('orderItems', orderItems)
+  const [refresh, setRefresh] = useState(0); 
   const [totalAmount, setTotalAmount] = useState(0.00);
-
-  const updateTotalAmount = useCallback((itemTotal) => {
-    setTotalAmount((prevTotal) => prevTotal + itemTotal);
-  }, []);
+  const [order, setOrder] = useState(orderItems.order_items);
 
   useEffect(() => {
-    // Calculate the initial total amount
-    let initialTotal = 0.00;
-    orderItems.forEach((item) => {
-      initialTotal += parseFloat(item.ord_price) * parseFloat(item.ord_qty);
+    calculateTotal()
+  }, [order])
+
+  const calculateTotal = () => {
+    let initialTotal = 0;
+
+    orderItems.order_items.forEach((item) => {
+      if (item.ord_id == order.ord_id) {
+        console.log('item',item.ordi_id)
+        console.log('item price',item.ord_price)
+        console.log('item qty',item.ord_qty)
+        console.log('-----------------------------')
+        console.log('order',order.ordi_id)
+        console.log('ord price',order.ord_price)
+        console.log('ord qty',order.ord_qty)
+        console.log('=============================')
+
+        if (item.ordi_id === order.ordi_id) {
+          if (item.ord_qty !== order.ord_qty) {
+            const changedQty = parseFloat(order.ord_qty) - parseFloat(item.ord_qty);
+            initialTotal += (parseFloat(item.ord_price) * parseFloat(item.ord_qty)) + (parseFloat(item.ord_price) * changedQty);
+          }else{
+            initialTotal += parseFloat(item.ord_price) * parseFloat(item.ord_qty);
+          }
+        }else{
+          initialTotal += parseFloat(item.ord_price) * parseFloat(item.ord_qty);
+        }
+      }
+
     });
+    console.log('initialTotal', initialTotal)
     setTotalAmount(initialTotal);
-  }, []);
+  };
+
 
   const toggleRefresh = () => {
-    setRefresh(prevStt => !prevStt);
+    setRefresh((prevStt) => !prevStt);
+    setOrder(orderItems.order_items);
   };
 
   const handleConfirm = () => {
@@ -129,24 +155,24 @@ const SingleOrderScreen = ({ navigation, route }) => {
             <Text style={styles.titleStyles}>Order Details</Text>
             <View style={styles.orderDetailsStyles}>
               <View style={styles.odTopStyles}>
-                <Text style={styles.orderIdStyle}>Order ID: #0001</Text>
-                <Text style={styles.orderDateStyle}>2023-06-29 12:45:00</Text>
+                <Text style={styles.orderIdStyle}>Order ID: #{orderItems.ord_id}</Text>
+                <Text style={styles.orderDateStyle}>{orderItems.c_date}</Text>
               </View>
               <View style={styles.odMiddleStyles}>
-                <Text>Buyer Name - Buyer Shop</Text>
+                <Text>{orderItems.buyer_name} - {orderItems.buyer_shop}</Text>
               </View>
               <View style={styles.odBottomStyles}>
                 <TouchableOpacity style={styles.contactButtonStyles} onPress={handleCallPress}>
                   <View style={styles.iconStyles}>
                     <Feather name="phone-call" size={20} color="black" />
                   </View>
-                  <Text style={styles.orderNumberStyle}>0714124766</Text>
+                  <Text style={styles.orderNumberStyle}>{orderItems.buyer_phone}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.contactButtonStyles} onPress={handleWtspPress}>
                   <View style={styles.iconStyles}>
                     <Ionicons name="logo-whatsapp" size={20} color="black" />
                   </View>
-                  <Text style={styles.orderNumberStyle}>0714124766</Text>
+                  <Text style={styles.orderNumberStyle}>{orderItems.buyer_whtsp}</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -154,8 +180,8 @@ const SingleOrderScreen = ({ navigation, route }) => {
           <View>
             <Text style={styles.titleStyles}>Order Items</Text>
             <View>
-              {orderItems.map((item) => (
-                <Item key={item.ordi_id} orderData={item} refresh={refresh} updateTotal={updateTotalAmount} />
+              {orderItems.order_items.map((item) => (
+                <Item key={item.ordi_id} orderData={item} refresh={refresh} setOrder={setOrder} />
               ))}
             </View>
           </View>
