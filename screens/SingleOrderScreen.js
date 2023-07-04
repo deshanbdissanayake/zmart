@@ -7,8 +7,7 @@ const Item = ({ orderData, refresh, setOrder }) => {
   const { ord_qty, pro_img, pro_name, ord_price } = orderData;
   const [qty, setQty] = useState(ord_qty.toString());
   const [ord, setOrd] = useState(orderData);
- 
-  //console.log('orderData', ord)
+
 
   useEffect(() => {
     setQty(ord_qty.toString());
@@ -70,51 +69,45 @@ const Item = ({ orderData, refresh, setOrder }) => {
 };
 
 const SingleOrderScreen = ({ navigation, route }) => {
-  const orderItems = route.params.order;
+  const orderDetails = route.params.order;
   //console.log('orderItems', orderItems)
-  const [refresh, setRefresh] = useState(0); 
+  const [refresh, setRefresh] = useState(0);
   const [totalAmount, setTotalAmount] = useState(0.00);
-  const [order, setOrder] = useState(orderItems.order_items);
+  const [orderItems, setOrderItems] = useState(orderDetails.order_items)
+  const [order, setOrder] = useState({});
 
   useEffect(() => {
-    calculateTotal()
-  }, [order])
 
-  const calculateTotal = () => {
+    // Copy the orderItems array
+    const updatedOrderItems = [...orderItems];
+
+    // Find the index of the object with the matching ordi_id
+    const index = updatedOrderItems.findIndex(item => item.ordi_id === order.ordi_id);
+
+    if (index !== -1) {
+      // Replace the object at the found index with the new order object
+      updatedOrderItems[index] = order;
+    }
+
+    // Update the orderItems state with the updated array
+    setOrderItems(updatedOrderItems);
+
+    calculateTotal(updatedOrderItems);
+
+  }, [order]);
+
+  const calculateTotal = (updatedOrderItems) => {
     let initialTotal = 0;
-
-    orderItems.order_items.forEach((item) => {
-      if (item.ord_id == order.ord_id) {
-        console.log('item',item.ordi_id)
-        console.log('item price',item.ord_price)
-        console.log('item qty',item.ord_qty)
-        console.log('-----------------------------')
-        console.log('order',order.ordi_id)
-        console.log('ord price',order.ord_price)
-        console.log('ord qty',order.ord_qty)
-        console.log('=============================')
-
-        if (item.ordi_id === order.ordi_id) {
-          if (item.ord_qty !== order.ord_qty) {
-            const changedQty = parseFloat(order.ord_qty) - parseFloat(item.ord_qty);
-            initialTotal += (parseFloat(item.ord_price) * parseFloat(item.ord_qty)) + (parseFloat(item.ord_price) * changedQty);
-          }else{
-            initialTotal += parseFloat(item.ord_price) * parseFloat(item.ord_qty);
-          }
-        }else{
-          initialTotal += parseFloat(item.ord_price) * parseFloat(item.ord_qty);
-        }
-      }
-
+    updatedOrderItems.forEach((item) => {
+        initialTotal += parseFloat(item.ord_price) * parseFloat(item.ord_qty);
     });
-    console.log('initialTotal', initialTotal)
     setTotalAmount(initialTotal);
   };
 
 
   const toggleRefresh = () => {
     setRefresh((prevStt) => !prevStt);
-    setOrder(orderItems.order_items);
+    setOrder(orderItems);
   };
 
   const handleConfirm = () => {
@@ -155,24 +148,24 @@ const SingleOrderScreen = ({ navigation, route }) => {
             <Text style={styles.titleStyles}>Order Details</Text>
             <View style={styles.orderDetailsStyles}>
               <View style={styles.odTopStyles}>
-                <Text style={styles.orderIdStyle}>Order ID: #{orderItems.ord_id}</Text>
-                <Text style={styles.orderDateStyle}>{orderItems.c_date}</Text>
+                <Text style={styles.orderIdStyle}>Order ID: #{orderDetails.ord_id}</Text>
+                <Text style={styles.orderDateStyle}>{orderDetails.c_date}</Text>
               </View>
               <View style={styles.odMiddleStyles}>
-                <Text>{orderItems.buyer_name} - {orderItems.buyer_shop}</Text>
+                <Text>{orderDetails.buyer_name} - {orderDetails.buyer_shop}</Text>
               </View>
               <View style={styles.odBottomStyles}>
                 <TouchableOpacity style={styles.contactButtonStyles} onPress={handleCallPress}>
                   <View style={styles.iconStyles}>
                     <Feather name="phone-call" size={20} color="black" />
                   </View>
-                  <Text style={styles.orderNumberStyle}>{orderItems.buyer_phone}</Text>
+                  <Text style={styles.orderNumberStyle}>{orderDetails.buyer_phone}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.contactButtonStyles} onPress={handleWtspPress}>
                   <View style={styles.iconStyles}>
                     <Ionicons name="logo-whatsapp" size={20} color="black" />
                   </View>
-                  <Text style={styles.orderNumberStyle}>{orderItems.buyer_whtsp}</Text>
+                  <Text style={styles.orderNumberStyle}>{orderDetails.buyer_whtsp}</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -180,7 +173,7 @@ const SingleOrderScreen = ({ navigation, route }) => {
           <View>
             <Text style={styles.titleStyles}>Order Items</Text>
             <View>
-              {orderItems.order_items.map((item) => (
+              {orderItems.map((item) => (
                 <Item key={item.ordi_id} orderData={item} refresh={refresh} setOrder={setOrder} />
               ))}
             </View>
