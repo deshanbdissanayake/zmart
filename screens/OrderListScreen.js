@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, SafeAreaView, TouchableOpacity, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, SafeAreaView, TouchableOpacity, RefreshControl, ScrollView } from 'react-native';
 import { MaterialCommunityIcons } from 'react-native-vector-icons';
 
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useIsFocused  } from '@react-navigation/native';
 
 import colors from '../assets/colors/colors';
-import Footer from '../components/footer/Footer';
 import { getMyOrders } from '../assets/data/order';
 
-const OrderItem = ({ order }) => {
+const OrderItem = ({ order, ordStatus }) => {
   const navigation = useNavigation();
 
   const handleItemPress = () => {
-    navigation.navigate('Single Order', { order })
-    //console.log('orderData', order);
+    navigation.navigate('Single Order', { order , ordStatus })
+    //console.log('orderData', refresh);
   };
 
   return (
@@ -40,15 +39,18 @@ const OrderListScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [orders, setOrders] = useState([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [ordStatus, setOrdStatus] = useState('active');
+
+  const isFocused = useIsFocused();
 
   useEffect(() => {
     fetchOrders();
-  }, []);
+  }, [isFocused, ordStatus]);
 
   const fetchOrders = async () => {
     setIsLoading(true);
     try {
-      const response = await getMyOrders();
+      const response = await getMyOrders(ordStatus);
       setOrders(response);
     } catch (error) {
       console.log('Error fetching orders:', error);
@@ -60,6 +62,7 @@ const OrderListScreen = () => {
 
   const handleRefresh = () => {
     setIsRefreshing(true);
+    setOrdStatus('active');
     fetchOrders();
   };
 
@@ -69,26 +72,39 @@ const OrderListScreen = () => {
     </View>
   );
 
-  const renderItem = ({ item }) => <OrderItem order={item} />;
-
+  const renderItem = (item) => <OrderItem order={item} ordStatus={ordStatus} />;
+    
   const renderOrderList = () => (
-    <View style={styles.container}>
-      <Text style={styles.title}>Order List</Text>
-      <FlatList
-        data={orders}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.ord_id.toString()}
-        refreshControl={
-          <RefreshControl
-            refreshing={isRefreshing}
-            onRefresh={handleRefresh}
-            colors={[colors.primary]}
-            progressBackgroundColor={colors.background}
-          />
-        }
+    
+    <ScrollView
+    style={styles.container}
+    refreshControl={
+      <RefreshControl
+        refreshing={isRefreshing}
+        onRefresh={handleRefresh}
+        progressBackgroundColor={colors.background}
       />
+    }
+  >
+    <View style={styles.titleWrapper}>
+      <TouchableOpacity onPress={() => setOrdStatus('active')}>
+        <Text style={[styles.title, {backgroundColor: ordStatus === 'active' ? colors.secondary : colors.bgLight }]}>New Orders</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => setOrdStatus('confirmed')}>
+        <Text style={[styles.title, {backgroundColor: ordStatus === 'confirmed' ? colors.secondary : colors.bgLight }]}>Confirmed Orders</Text>
+      </TouchableOpacity>
     </View>
+    {orders.length !== 0 ? (
+      orders.map((order) => renderItem(order))
+    ) : (
+      <View style={styles.orderErrorWrapper}>
+        <Text style={styles.orderErrorText}>No New Orders!</Text>
+      </View>
+    )}
+  </ScrollView>
+    
   );
+  
 
   return (
     <SafeAreaView style={styles.container}>
@@ -102,10 +118,16 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 10,
   },
+  titleWrapper:{
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
   title: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 16,
+    padding: 5,
+    borderRadius: 5,
   },
   loadingContainer: {
     flex: 1,
@@ -147,6 +169,14 @@ const styles = StyleSheet.create({
   },
   iconStyles: {
     flex: 1,
+  },
+  orderErrorWrapper: {
+    backgroundColor: colors.gray,
+    paddingVertical: 5,
+  },
+  orderErrorText: {
+    textAlign:'center',
+    fontStyle: 'italic'
   },
 });
 

@@ -26,7 +26,7 @@ const RegistrationScreen = ({navigation}) => {
   const [whatsapp, setWhatsapp] = useState('');
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
-  const [nic, setNic] = useState('');
+  //const [nic, setNic] = useState('');
   const [shopName, setShopName] = useState('');
   
   //errors
@@ -106,7 +106,7 @@ const RegistrationScreen = ({navigation}) => {
       }
 
       // Validation for NIC
-      if (!nic) {
+      /*if (!nic) {
         setNicError(true);
         isValid = false;
       } else {
@@ -120,7 +120,7 @@ const RegistrationScreen = ({navigation}) => {
         } else {
           setNicError(false);
         }
-      }
+      }*/
 
       // Validation for Shop Name
       if (!shopName) {
@@ -223,7 +223,7 @@ const verifyNumberFunc = async () => {
     const formData = new FormData();
 
     formData.append('address', address);
-    formData.append('nic', nic);
+    //formData.append('nic', nic);
     formData.append('shopname', shopName);
     formData.append('supname', name);
     formData.append('wapp_no', whatsapp);
@@ -284,7 +284,7 @@ const verifyNumberFunc = async () => {
   const saveAsyncStorage = async (asyncData) => {
     try {
       const logDataString = JSON.stringify(asyncData);
-      console.log('Save async:', logDataString);
+      console.log('Save async');
   
       await AsyncStorage.setItem('log_data', logDataString);
       console.log('log_data saved to AsyncStorage');
@@ -501,7 +501,7 @@ const verifyNumberFunc = async () => {
                 ''
               )}
             </View>
-            <View style={styles.formGroup}>
+            {/*<View style={styles.formGroup}>
               <View style={styles.formContainer}>
                 <TextInput
                   style={styles.input}
@@ -519,7 +519,7 @@ const verifyNumberFunc = async () => {
               ) : (
                 ''
               )}
-            </View>
+              </View>*/}
             <View style={styles.formGroup}>
               <View style={styles.formContainer}>
                 <TextInput

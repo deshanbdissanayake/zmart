@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image, ScrollView, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { AntDesign, Feather, Ionicons, Fontisto } from 'react-native-vector-icons';
 import colors from '../assets/colors/colors';
 
-const Item = ({ orderData, refresh, setOrder }) => {
+import { confirmOrder } from '../assets/data/order';
+
+const Item = ({ orderData, refresh, setOrder, ordStatus }) => {
+  //console.log(orderData)
   const { ord_qty, pro_img, pro_name, ord_price } = orderData;
   const [qty, setQty] = useState(ord_qty.toString());
   const [ord, setOrd] = useState(orderData);
-
 
   useEffect(() => {
     setQty(ord_qty.toString());
@@ -43,57 +45,65 @@ const Item = ({ orderData, refresh, setOrder }) => {
 
   return (
     <View style={styles.itemCardWrapper}>
-      <Image source={pro_img} style={styles.itemCardImgStyles} />
+      <Image source={{ uri: pro_img }} style={styles.itemCardImgStyles} />
       <View style={styles.itemCardTextStyles}>
         <Text style={styles.itemCardNameStyles} numberOfLines={2}>
           {pro_name}
         </Text>
         <Text style={styles.itemCardPriceStyles}>LKR {parseFloat(ord_price).toFixed(2)}</Text>
       </View>
-      <View style={styles.itemCardQtyStyles}>
-        <TouchableOpacity onPress={handleIncreaseQty}>
-          <AntDesign name="caretup" size={20} color="black" />
-        </TouchableOpacity>
-        <TextInput
-          value={qty}
-          onChangeText={handleQty}
-          style={styles.inputStyle}
-          keyboardType="number-pad"
-        />
-        <TouchableOpacity onPress={handleDecreaseQty}>
-          <AntDesign name="caretdown" size={20} color="black" />
-        </TouchableOpacity>
-      </View>
+      {ordStatus === 'active' ? (
+          <View style={styles.itemCardQtyStyles}>
+            <TouchableOpacity onPress={handleIncreaseQty}>
+              <AntDesign name="caretup" size={20} color="black" />
+            </TouchableOpacity>
+            <TextInput
+              value={qty}
+              onChangeText={handleQty}
+              style={styles.inputStyle}
+              keyboardType="number-pad"
+            />
+            <TouchableOpacity onPress={handleDecreaseQty}>
+              <AntDesign name="caretdown" size={20} color="black" />
+            </TouchableOpacity>
+          </View>
+        ) : (
+            <View style={styles.itemCardQtyStyles}>
+              <TextInput
+                value={qty}
+                style={styles.inputStyle}
+                keyboardType="number-pad"
+                editable={false}
+                color={colors.black}
+              />
+            </View>
+        )}
+      
     </View>
   );
 };
 
 const SingleOrderScreen = ({ navigation, route }) => {
   const orderDetails = route.params.order;
-  //console.log('orderItems', orderItems)
+  const ordStatus = route.params.ordStatus;
+
   const [refresh, setRefresh] = useState(0);
   const [totalAmount, setTotalAmount] = useState(0.00);
   const [orderItems, setOrderItems] = useState(orderDetails.order_items)
   const [order, setOrder] = useState({});
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-
-    // Copy the orderItems array
     const updatedOrderItems = [...orderItems];
-
-    // Find the index of the object with the matching ordi_id
     const index = updatedOrderItems.findIndex(item => item.ordi_id === order.ordi_id);
 
     if (index !== -1) {
-      // Replace the object at the found index with the new order object
       updatedOrderItems[index] = order;
     }
 
-    // Update the orderItems state with the updated array
     setOrderItems(updatedOrderItems);
-
     calculateTotal(updatedOrderItems);
-
+    
   }, [order]);
 
   const calculateTotal = (updatedOrderItems) => {
@@ -107,10 +117,11 @@ const SingleOrderScreen = ({ navigation, route }) => {
 
   const toggleRefresh = () => {
     setRefresh((prevStt) => !prevStt);
+    setOrderItems(orderDetails.order_items);
     setOrder(orderItems);
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     Alert.alert(
       'Confirm the Order',
       'Are you sure you want to confirm?',
@@ -121,16 +132,46 @@ const SingleOrderScreen = ({ navigation, route }) => {
         },
         {
           text: 'Confirm',
-          onPress: () => {
-            console.log('confirm');
-            navigation.goBack();
+          onPress: async () => {
+            setLoading(true);
+              
+            try {
+              const formData = new FormData();
+    
+              orderItems.forEach((e) => {
+                formData.append(`ord_qty[${e.ordi_id}]`, e.ord_qty);
+              });
+              formData.append(`ord_id`, orderItems[0].ord_id);
+
+              const response = await confirmOrder(formData);
+
+              if (response.stt === 'ok') {
+
+                Alert.alert('Success', response.msg, [
+                  { text: 'OK', onPress: () => navigation.goBack({ refresh: true }) },
+                ]);
+
+              } else {
+      
+                Alert.alert('Error', response.msg, [
+                  { text: 'OK', onPress: () => console.log('OK Pressed') },
+                ]);
+      
+              }
+
+            } catch (error) {
+              Alert.alert('Error', 'Failed to confirm order.');
+            } finally {
+              setLoading(false);
+            }
+            
           },
         },
       ],
       { cancelable: false }
     );
   };
-
+  
   const handleCallPress = () => {
     console.log('call');
   };
@@ -174,7 +215,7 @@ const SingleOrderScreen = ({ navigation, route }) => {
             <Text style={styles.titleStyles}>Order Items</Text>
             <View>
               {orderItems.map((item) => (
-                <Item key={item.ordi_id} orderData={item} refresh={refresh} setOrder={setOrder} />
+                <Item key={item.ordi_id} orderData={item} refresh={refresh} setOrder={setOrder} ordStatus={ordStatus} />
               ))}
             </View>
           </View>
@@ -185,16 +226,32 @@ const SingleOrderScreen = ({ navigation, route }) => {
         </View>
       </View>
     </ScrollView>
-    <View style={styles.bottomButtonsWrapper}>
-    <TouchableOpacity style={styles.bottomButtonStyles} onPress={toggleRefresh}>
-      <Text style={styles.bottomButtonText}>Reset</Text>
-      <Fontisto name="undo" size={24} color={colors.red} />
-    </TouchableOpacity>
-    <TouchableOpacity style={styles.bottomButtonStyles} onPress={handleConfirm}>
-      <Text style={styles.bottomButtonText}>Confirm</Text>
-      <Ionicons name="checkmark-circle" size={24} color={colors.secondary} />
-    </TouchableOpacity>
-  </View>
+
+    {ordStatus === 'active' && !loading && (
+      <View style={styles.bottomButtonsWrapper}>
+        <TouchableOpacity style={styles.bottomButtonStyles} onPress={toggleRefresh}>
+          <Text style={styles.bottomButtonText}>Reset</Text>
+          <Fontisto name="undo" size={24} color={colors.red} />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.bottomButtonStyles} onPress={handleConfirm}>
+          <Text style={styles.bottomButtonText}>Confirm</Text>
+          <Ionicons name="checkmark-circle" size={24} color={colors.secondary} />
+        </TouchableOpacity>
+      </View>
+    )}
+
+    {ordStatus === 'active' && loading && (
+      <View style={styles.bottomButtonsActivityIndicator}>
+        <ActivityIndicator />
+      </View>
+    )}
+
+    {ordStatus !== 'active' && (
+      <View style={styles.bottomButtonsActivityIndicator}></View>
+    )}
+
+    
+    
   </>
   );
 };
@@ -209,7 +266,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   titleStyles: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
   },
@@ -264,6 +321,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderColor: colors.border,
     flexDirection: 'row',
+    height: 90,
   },
   itemCardImgStyles: {
     flex: 3,
@@ -321,6 +379,14 @@ const styles = StyleSheet.create({
   totalAmount: {
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  bottomButtonsActivityIndicator:{
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 10,
+    backgroundColor: colors.bgDark,
+    borderTopRightRadius: 10,
+    borderTopLeftRadius: 10,
   },
   bottomButtonsWrapper: {
     flexDirection: 'row',

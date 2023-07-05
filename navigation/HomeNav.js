@@ -10,6 +10,7 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  Alert
 } from 'react-native';
 import { FontAwesome5, Ionicons } from 'react-native-vector-icons'; 
 
@@ -19,20 +20,36 @@ import OrdListNav from './OrdListNav';
 import MyProListNav from './MyProListNav';
 import AddProductScreen from '../screens/AddProductScreen';
 import colors from '../assets/colors/colors';
-import AuthContext from '../AuthContext';
 
 const Drawer = createDrawerNavigator();
 
 // Custom drawer content component
-const CustomDrawerContent = ({ navigation, state, descriptors }) => {
+const CustomDrawerContent = ({ navigation, state, descriptors, handleLogout }) => {
+
   const closeDrawer = () => {
     navigation.closeDrawer();
   };
 
-  const { handleLogout } = useContext(AuthContext);
-
   const handleLogoutClick = () => {
-    handleLogout();
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to logout from the app ?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Logout',
+          style: 'destructive',
+          onPress: async () => {
+            console.log('logout')
+            handleLogout
+          },
+        },
+      ]
+    );
+    
   };
 
   return (
@@ -72,11 +89,13 @@ const CustomDrawerContent = ({ navigation, state, descriptors }) => {
   );
 };
 
-const HomeNav = () => {
+const HomeNav = (props) => {
+  const { handleLogout } = props;
+
   return (
     <Drawer.Navigator
       initialRouteName="My Products"
-      drawerContent={(props) => <CustomDrawerContent {...props} />}
+      drawerContent={(dprops) => <CustomDrawerContent {...dprops} handleLogout={handleLogout} />}
       screenOptions={{
         drawerActiveTintColor: colors.secondary,
         drawerInactiveTintColor: colors.white,

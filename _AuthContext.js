@@ -2,14 +2,15 @@
 import React, { useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { validateUser } from './assets/data/user'; // Import the user validation function
+import { useEffect } from 'react';
 
 const AuthContext = React.createContext();
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(true);
 
-  const handleLogout = () => {
-    clearAsyncStorage();
+  const handleLogout = async () => {
+    await clearAsyncStorage();
     setIsAuthenticated(false);
   };
 
@@ -47,7 +48,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Check user validity when the component mounts
-  useState(() => {
+  useEffect(() => {
     validateUserAndLogout();
   }, []);
 
