@@ -177,8 +177,8 @@ const ProductListScreen = ({ route }) => {
           }
         />
       </View>
-
-      {propsData.type === 'myProducts' ? (
+      <Footer />
+      {/*propsData.type === 'myProducts' ? (
         propsForItems.shareBtnClicked ||
         propsForItems.invoiceBtnClicked ||
         propsForItems.stockBtnClicked ? (
@@ -261,7 +261,7 @@ const ProductListScreen = ({ route }) => {
         )
       ) : (
         <Footer />
-      )}
+      )*/}
     </View>
   );
 

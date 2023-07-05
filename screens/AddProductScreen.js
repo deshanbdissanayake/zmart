@@ -19,7 +19,7 @@ import { addProduct } from '../assets/data/product';
 const AddProductScreen = ({ route, navigation }) => {
   const { productData, updateProductData } = route.params || {};
   //console.log(productData);
-  
+
   const [newProductData, setNewProductData] = useState({
     proId: productData?.id || '',
     proName: productData?.name || '',
@@ -46,24 +46,56 @@ const AddProductScreen = ({ route, navigation }) => {
   const [loading, setLoading] = useState(false);
 
   const handleImageSelect = async (imageNumber) => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const showImagePickerOptions = () => {
+      Alert.alert(
+        'Select Image Source',
+        'Choose the source of the image',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Camera', onPress: () => launchCamera() },
+          { text: 'Library', onPress: () => launchImageLibrary() },
+        ],
+        { cancelable: true }
+      );
+    };
 
-    if (status !== 'granted') {
-      alert('Permission to access media library is required!');
-      return;
-    }
+    const launchCamera = async () => {
+      const { status: cameraStatus } = await ImagePicker.requestCameraPermissionsAsync();
+      if (cameraStatus !== 'granted') {
+        alert('Permission to access the camera is required!');
+        return;
+      }
+      launchImagePicker(true);
+    };
 
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
-    });
+    const launchImageLibrary = async () => {
+      const { status: libraryStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (libraryStatus !== 'granted') {
+        alert('Permission to access the media library is required!');
+        return;
+      }
+      launchImagePicker(false);
+    };
 
-    if (!result.canceled) {
-      const key = `image${imageNumber}`;
-      handleInputChange(key, result.assets[0].uri);
-    }
+    const launchImagePicker = async (isCamera) => {
+      const options = {
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+      };
+
+      const result = isCamera
+        ? await ImagePicker.launchCameraAsync(options)
+        : await ImagePicker.launchImageLibraryAsync(options);
+
+      if (!result.canceled) {
+        const key = `image${imageNumber}`;
+        handleInputChange(key, result.assets[0].uri);
+      }
+    };
+
+    showImagePickerOptions();
   };
 
   const handleInputChange = (key, value) => {
@@ -72,49 +104,49 @@ const AddProductScreen = ({ route, navigation }) => {
       [key]: value,
     }));
   };
-  
+
 
   const handleButtonClick = async () => {
     const errors = {};
-  
+
     if (proName.trim() === '') {
       errors.proNameError = true;
     }
-  
+
     if (proDesc.trim() === '') {
       errors.proDescError = true;
     }
-  
+
     if (proPrice.trim() === '' || parseFloat(proPrice) < 0) {
       errors.proPriceError = true;
     }
-    
+
     if (proQty.trim() === '' || parseInt(proQty) < 0 || proQty.includes('.')) {
       errors.proQtyError = true;
-    }     
-  
+    }
+
     if (image1 === '') {
       errors.image1Error = true;
     }
-  
+
     if (image2 === '') {
       errors.image2Error = true;
     }
-  
+
     if (image3 === '') {
       errors.image3Error = true;
     }
-  
+
     setFormErrors(errors);
-  
+
     if (Object.keys(errors).length === 0) {
       setLoading(true);
       console.log('Product save Button pressed');
-  
+
       try {
         // Create a new form data object
         const formData = new FormData();
-  
+
         // Append the image data to the form data object
         formData.append('image1', {
           uri: image1,
@@ -136,12 +168,12 @@ const AddProductScreen = ({ route, navigation }) => {
         formData.append('proDes', proDesc);
         formData.append('proPrice', proPrice);
         formData.append('proQty', proQty);
-  
+
         const response = await addProduct(formData); // Call addProduct with the newProductData
         //console.log('check2')
 
         console.log(response);
-  
+
         let msg = proId != '' ? 'Updated' : 'Added'
 
         if (response.stt === 'ok') {
@@ -149,7 +181,7 @@ const AddProductScreen = ({ route, navigation }) => {
           Alert.alert('Success', 'Product '+msg+' successfully!', [
             { text: 'OK', onPress: () => console.log('OK Pressed') },
           ]);
-          
+
           handleReset();
 
         } else {
@@ -166,7 +198,7 @@ const AddProductScreen = ({ route, navigation }) => {
       }
     }
   };
-  
+
 
   const handleReset = () => {
     if(proId !== ''){
@@ -205,7 +237,7 @@ const AddProductScreen = ({ route, navigation }) => {
 
   const ImageButton = ({ imageNumber }) => {
     const imageSource = newProductData[`image${imageNumber}`];
-  
+
     return (
       <TouchableOpacity onPress={() => handleImageSelect(imageNumber)}>
         <View style={[styles.singleImage, styles.shadowStyle]}>
@@ -218,7 +250,7 @@ const AddProductScreen = ({ route, navigation }) => {
       </TouchableOpacity>
     );
   };
-  
+
 
   return (
     <View style={styles.container}>

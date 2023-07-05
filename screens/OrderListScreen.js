@@ -72,7 +72,7 @@ const OrderListScreen = () => {
     </View>
   );
 
-  const renderItem = (item) => <OrderItem order={item} ordStatus={ordStatus} />;
+  const renderItem = (item) => <OrderItem key={item.ord_id} order={item} ordStatus={ordStatus} />;
     
   const renderOrderList = () => (
     
@@ -98,7 +98,7 @@ const OrderListScreen = () => {
       orders.map((order) => renderItem(order))
     ) : (
       <View style={styles.orderErrorWrapper}>
-        <Text style={styles.orderErrorText}>No New Orders!</Text>
+        <Text style={styles.orderErrorText}>No {ordStatus === 'active' ? 'New' : 'Confirmed'} Orders Yet!</Text>
       </View>
     )}
   </ScrollView>

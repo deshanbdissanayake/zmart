@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
   View,
   Text,
@@ -15,8 +15,12 @@ import colors from '../assets/colors/colors';
 
 import { sendOtp, verifyNumber, saveUser } from '../assets/data/user';
 import { log_data } from '../assets/data/system'; //getting dummy data
+import AuthContext from '../context/AuthContext';
 
 const RegistrationScreen = ({navigation}) => {
+
+  const { saveAsyncStorage } = useContext(AuthContext)
+
   //========================================================================================= 
   //form states
   const [userToken, setUserToken] = useState('');
@@ -28,7 +32,7 @@ const RegistrationScreen = ({navigation}) => {
   const [address, setAddress] = useState('');
   //const [nic, setNic] = useState('');
   const [shopName, setShopName] = useState('');
-  
+
   //errors
   const [phoneNumberError, setPhoneNumberError] = useState(false);
   const [otpError, setOtpError] = useState(false);
@@ -36,7 +40,7 @@ const RegistrationScreen = ({navigation}) => {
   const [whatsappError, setWhatsappError] = useState(false);
   const [nameError, setNameError] = useState(false);
   const [addressError, setAddressError] = useState(false);
-  const [nicError, setNicError] = useState(false);
+  //const [nicError, setNicError] = useState(false);
   const [shopNameError, setShopNameError] = useState(false);
 
   //other states
@@ -170,7 +174,7 @@ const verifyNumberFunc = async () => {
     if (verifyData.stt === 'ok') {
 
       // =================================================
-      
+
       if(verifyData.payload.reg === 'required'){
         // Update log data
         const updatedLogData = {
@@ -199,12 +203,12 @@ const verifyNumberFunc = async () => {
         await saveAsyncStorage(updatedLogData);
 
         // Check the updated logData.log_status value
-        navigation.navigate('Home');
-        
+        //navigation.navigate('Home');
+
       }
 
       // =================================================
-      
+
     } else {
       setOtpError(true);
     }
@@ -250,7 +254,7 @@ const verifyNumberFunc = async () => {
         await saveAsyncStorage(updatedLogData);
 
         // Check the updated logData.log_status value
-        navigation.navigate('Home');
+        //navigation.navigate('Home');
 
         //clearAsyncStorage();
       }else{
@@ -277,25 +281,6 @@ const verifyNumberFunc = async () => {
     setShowResend(false);
     setPhoneNumberVerified(false);
   };
-
-  //=========================================================================================
-
-  // Save log_data to AsyncStorage
-  const saveAsyncStorage = async (asyncData) => {
-    try {
-      const logDataString = JSON.stringify(asyncData);
-      console.log('Save async');
-  
-      await AsyncStorage.setItem('log_data', logDataString);
-      console.log('log_data saved to AsyncStorage');
-    } catch (error) {
-      console.error('Error saving log_data to AsyncStorage:', error);
-    }
-  };
-
-  
-
-  //=========================================================================================
 
   return (
     <View style={styles.container}>

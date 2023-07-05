@@ -20,11 +20,13 @@ import OrdListNav from './OrdListNav';
 import MyProListNav from './MyProListNav';
 import AddProductScreen from '../screens/AddProductScreen';
 import colors from '../assets/colors/colors';
+import AuthContext from '../context/AuthContext';
 
 const Drawer = createDrawerNavigator();
 
 // Custom drawer content component
-const CustomDrawerContent = ({ navigation, state, descriptors, handleLogout }) => {
+const CustomDrawerContent = ({ navigation, state, descriptors }) => {
+  const { logData, logout } = useContext(AuthContext)
 
   const closeDrawer = () => {
     navigation.closeDrawer();
@@ -44,61 +46,60 @@ const CustomDrawerContent = ({ navigation, state, descriptors, handleLogout }) =
           style: 'destructive',
           onPress: async () => {
             console.log('logout');
-            handleLogout(); 
+            logout();
           },
         },
       ]
     );
-  };  
+  };
 
   return (
-    <DrawerContentScrollView style={styles.drawerWrapper}>
+    <DrawerContentScrollView
+      contentContainerStyle={styles.drawerWrapper}
+    >
       {/* Profile Section */}
-      <View style={styles.profileSection}>
-        <View style={styles.profileImageWrapper}>
-          <FontAwesome5 name="user" size={50} color={colors.textDark} />
+      <View style={styles.drawerTopWrapper}>
+        <View style={styles.profileSection}>
+          <View style={styles.profileImageWrapper}>
+            <FontAwesome5 name="user" size={50} color={colors.textDark} />
+          </View>
+          <View style={styles.profileTextWrapper}>
+            <Text style={styles.profileText}>{logData.log_userName}</Text>
+            <Text style={styles.profilePhone}>{logData.log_userNumber}</Text>
+          </View>
+          <TouchableOpacity style={styles.drawerClose} onPress={closeDrawer} >
+            <Ionicons name="close" size={24} color={colors.textLight} />
+          </TouchableOpacity>
         </View>
-        <View style={styles.profileTextWrapper}>
-          <Text style={styles.profileText}>User Profile</Text>
-        </View>
-        <TouchableOpacity style={styles.drawerClose} onPress={closeDrawer} >
-          <Ionicons name="close" size={24} color={colors.textLight} />
-        </TouchableOpacity>
+
+        {/* Drawer Items */}
+        <DrawerItemList
+          state={state}
+          navigation={navigation}
+          descriptors={descriptors}
+        />
       </View>
-
-      {/* Drawer Items */}
-      <DrawerItemList 
-        state={state} 
-        navigation={navigation} 
-        descriptors={descriptors} 
-      />
-
-      {/* Other Drawer Buttons */}
-      <DrawerItem label="Terms & Conditions" labelStyle={styles.drawerItem} />
-      <DrawerItem label="About Us" labelStyle={styles.drawerItem} />
-      <DrawerItem 
-        label="Logout" 
-        labelStyle={styles.drawerItem} 
-        onPress={() => {
-          handleLogoutClick();
-        }} 
-      />
+      <View style={styles.drawerBottomWrapper}>
+        <DrawerItem
+          label="Logout"
+          labelStyle={{color: colors.white}}
+          onPress={handleLogoutClick}
+          icon={({ size }) => (
+            <Ionicons name="log-out-outline" size={size} color={colors.white} />
+          )}
+        />
+      </View>
 
     </DrawerContentScrollView>
   );
 };
 
-const HomeNav = (props) => {
-  const { handleLogout } = props;
-
-  const logout = () => {
-    handleLogout
-  }
+const HomeNav = () => {
 
   return (
     <Drawer.Navigator
       initialRouteName="My Products"
-      drawerContent={(dprops) => <CustomDrawerContent {...dprops} handleLogout={logout} />}
+      drawerContent={(props) => <CustomDrawerContent {...props} />}
       screenOptions={{
         drawerActiveTintColor: colors.secondary,
         drawerInactiveTintColor: colors.white,
@@ -107,17 +108,47 @@ const HomeNav = (props) => {
       <Drawer.Screen
         name="My Products"
         component={MyProListNav}
-        options={{ headerShown: false }}
+        options={{
+          drawerLabel: 'My Products',
+          drawerIcon: ({ focused, color, size }) => (
+            <Ionicons
+              name={focused ? 'ios-cart' : 'ios-cart-outline'}
+              size={size}
+              color={color}
+            />
+          ),
+          headerShown: false,
+        }}
       />
       <Drawer.Screen
         name="My Orders"
         component={OrdListNav}
-        options={{ headerShown: false }}
+        options={{
+          drawerLabel: 'My Orders',
+          drawerIcon: ({ focused, color, size }) => (
+            <Ionicons
+              name={focused ? 'ios-list' : 'ios-list-outline'}
+              size={size}
+              color={color}
+            />
+          ),
+          headerShown: false,
+        }}
       />
       <Drawer.Screen
         name="Products List"
         component={ProListNav}
-        options={{ headerShown: false }}
+        options={{
+          drawerLabel: 'Products List',
+          drawerIcon: ({ focused, color, size }) => (
+            <Ionicons
+              name={focused ? 'ios-list-circle' : 'ios-list-circle-outline'}
+              size={size}
+              color={color}
+            />
+          ),
+          headerShown: false,
+        }}
       />
       <Drawer.Screen
         name="Create Product"
@@ -131,8 +162,17 @@ const HomeNav = (props) => {
           },
           headerTintColor: colors.secondary,
           headerShown: true,
+          drawerLabel: 'Create Product',
+          drawerIcon: ({ focused, color, size }) => (
+            <Ionicons
+              name={focused ? 'ios-add' : 'ios-add-outline'}
+              size={size}
+              color={color}
+            />
+          ),
         }}
       />
+
     </Drawer.Navigator>
   );
 };
@@ -141,16 +181,25 @@ export default HomeNav;
 
 const styles = StyleSheet.create({
   drawerWrapper:{
+    flex: 1,
+    justifyContent: 'space-between',
     backgroundColor: colors.bgDark,
     color: colors.white,
   },
+  drawerTopWrapper:{
+    flex: 11,
+  },
+  drawerBottomWrapper:{
+    flex: 2,
+    borderTopWidth: 1,
+    borderTopColor: colors.gray,
+    margin: 10,
+  },
   profileSection:{
-    flex: 1,
     alignItems: 'center',
     borderBottomWidth: 1,
     borderBottomColor: colors.gray,
     paddingVertical: 5,
-    paddingHorizontal: 10,
     margin: 10,
   },
   profileImageWrapper:{
@@ -166,13 +215,16 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 18,
     color: colors.white,
+    textAlign: 'center',
+  },
+  profilePhone:{
+    fontSize: 12,
+    color: colors.white,
+    textAlign: 'center',
   },
   drawerClose:{
     position: 'absolute',
     top: 0,
     right: 0,
-  },
-  drawerItem:{
-    color: colors.white,
   },
 })
