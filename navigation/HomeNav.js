@@ -43,14 +43,13 @@ const CustomDrawerContent = ({ navigation, state, descriptors, handleLogout }) =
           text: 'Logout',
           style: 'destructive',
           onPress: async () => {
-            console.log('logout')
-            handleLogout
+            console.log('logout');
+            handleLogout(); 
           },
         },
       ]
     );
-    
-  };
+  };  
 
   return (
     <DrawerContentScrollView style={styles.drawerWrapper}>
@@ -92,10 +91,14 @@ const CustomDrawerContent = ({ navigation, state, descriptors, handleLogout }) =
 const HomeNav = (props) => {
   const { handleLogout } = props;
 
+  const logout = () => {
+    handleLogout
+  }
+
   return (
     <Drawer.Navigator
       initialRouteName="My Products"
-      drawerContent={(dprops) => <CustomDrawerContent {...dprops} handleLogout={handleLogout} />}
+      drawerContent={(dprops) => <CustomDrawerContent {...dprops} handleLogout={logout} />}
       screenOptions={{
         drawerActiveTintColor: colors.secondary,
         drawerInactiveTintColor: colors.white,

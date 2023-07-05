@@ -21,7 +21,7 @@ function App() {
 
   const [isAuthenticated, setIsAuthenticated] = useState(true);
 
-  const handleLogout = async () => {
+  const logoutUser = async () => {
     console.log('logout clicked')
     //await clearAsyncStorage();
     //setIsAuthenticated(false);
@@ -49,7 +49,7 @@ function App() {
           console.log('Valid user');
         } else {
           console.log('Invalid user');
-          handleLogout();
+          logoutUser();
         }
       } else {
         console.log('log_data does not exist in AsyncStorage');
@@ -120,11 +120,12 @@ function App() {
           <Stack.Screen
             name="Home"
             component={HomeNav}
-            options={{ headerShown: false }} 
+            options={{ headerShown: false }}
             initialParams={{
-              handleLogout: handleLogout,
+              handleLogout: logoutUser,
             }}
           />
+
 
         </Stack.Navigator>
       </NavigationContainer>
