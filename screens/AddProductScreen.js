@@ -78,16 +78,20 @@ const AddProductScreen = ({ route, navigation }) => {
     };
 
     const launchImagePicker = async (isCamera) => {
-      const options = {
-        mediaTypes: ImagePicker.MediaTypeOptions.All,
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 1,
-      };
 
       const result = isCamera
-        ? await ImagePicker.launchCameraAsync(options)
-        : await ImagePicker.launchImageLibraryAsync(options);
+        ? await ImagePicker.launchCameraAsync({
+          mediaTypes:ImagePicker.MediaTypeOptions.Images,
+          allowsEditing:true,
+          aspect:[1,1],
+          quality:0.5
+        })
+        : await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.All,
+          allowsEditing: true,
+          aspect: [1, 1],
+          quality: 1,
+        });
 
       if (!result.canceled) {
         const key = `image${imageNumber}`;
