@@ -9,7 +9,7 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [logData, setLogData] = useState(log_data);
-  const [userStatus, setUserStatus] = useState(null);
+  const [userStatus, setUserStatus] = useState(log_data.log_status);
 
   const isLogedIn = async () => {
     await getDataFromAsyncStorage();
@@ -19,20 +19,49 @@ export const AuthProvider = ({ children }) => {
     await clearAsyncStorage();
   }
 
-  const saveAsyncStorage = async (asyncData) => {
-    setIsLoading(true);
+  /*const saveAsyncStorage = async (asyncData, action) => {
+    if(action === 'register_required'){
+      try {
+        //console.log('asyncData', asyncData)
+        const logDataString = JSON.stringify(asyncData);
+        await AsyncStorage.setItem('log_data', logDataString);
+        console.log('log_data saved to AsyncStorage - register required');
+      } catch (error) {
+        console.error('Error saving log_data to AsyncStorage:', error);
+      }
+    }else{
+      setIsLoading(true);
+      try {
+        //console.log('asyncData', asyncData)
+        const logDataString = JSON.stringify(asyncData);
+        await AsyncStorage.setItem('log_data', logDataString);
+        setLogData(asyncData);
+        setUserStatus(asyncData.log_status);
+        console.log('log_data saved to AsyncStorage - already registered');
+      } catch (error) {
+        console.error('Error saving log_data to AsyncStorage:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };*/
+
+  const saveAsyncStorage = async (asyncData, action) => {
     try {
       const logDataString = JSON.stringify(asyncData);
-      setLogData(asyncData);
-      setUserStatus(asyncData.log_userStatus);
       await AsyncStorage.setItem('log_data', logDataString);
-      console.log('log_data saved to AsyncStorage');
+      console.log('log_data saved to AsyncStorage - ' + (action === 'register_required' ? 'register required' : 'registered'));
+      
+      if (action !== 'register_required') {
+        setIsLoading(true);
+        setLogData(asyncData);
+        setUserStatus(asyncData.log_status);
+        setIsLoading(false);
+      }
     } catch (error) {
       console.error('Error saving log_data to AsyncStorage:', error);
-    } finally {
-      setIsLoading(false);
     }
-  };
+  };  
 
   const getDataFromAsyncStorage = async () => {
     setIsLoading(true);
@@ -46,7 +75,7 @@ export const AuthProvider = ({ children }) => {
         if (checkUser) {
           console.log('Valid user');
           setLogData(asyncLogData);
-          setUserStatus(asyncLogData.log_userStatus);
+          setUserStatus(asyncLogData.log_status);
         } else {
           console.log('Invalid user');
         }
@@ -62,9 +91,9 @@ export const AuthProvider = ({ children }) => {
   const clearAsyncStorage = async () => {
     setIsLoading(true);
     try {
+      await AsyncStorage.clear();
       setLogData(log_data)
       setUserStatus(null);
-      await AsyncStorage.clear();
       console.log('AsyncStorage cleared successfully.');
     } catch (error) {
       console.error('Error clearing AsyncStorage:', error);

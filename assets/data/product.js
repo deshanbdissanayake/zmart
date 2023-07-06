@@ -57,6 +57,7 @@ const getProducts = async (type) => {
     };
 
     const response = await fetch(url, options);
+    //console.log(response)
     const responseData = await response.json();
     return responseData;
   } catch (error) {

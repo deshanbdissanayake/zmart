@@ -18,7 +18,7 @@ const Stack = createStackNavigator();
 
 const AppNav = () => {
 
-    const {isLoading, userStatus} = useContext(AuthContext);
+    const {isLoading, userStatus, logData} = useContext(AuthContext);
 
     if(isLoading){
         return (
@@ -28,7 +28,7 @@ const AppNav = () => {
 
   return (
     <NavigationContainer>
-        {userStatus !== null ? <HomeNav/> : <RegistrationScreen/>}
+        {userStatus ? <HomeNav/> : <RegistrationScreen asyncLogData={logData} />}
     </NavigationContainer>
   );
 };

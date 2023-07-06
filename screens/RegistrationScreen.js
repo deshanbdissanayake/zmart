@@ -14,10 +14,9 @@ import { Ionicons } from 'react-native-vector-icons';
 import colors from '../assets/colors/colors';
 
 import { sendOtp, verifyNumber, saveUser } from '../assets/data/user';
-import { log_data } from '../assets/data/system'; //getting dummy data
 import AuthContext from '../context/AuthContext';
 
-const RegistrationScreen = ({navigation}) => {
+const RegistrationScreen = ({ asyncLogData }) => {
 
   const { saveAsyncStorage } = useContext(AuthContext)
 
@@ -49,13 +48,19 @@ const RegistrationScreen = ({navigation}) => {
   const [showResend, setShowResend] = useState(false);
   const [phoneNumberVerified, setPhoneNumberVerified] = useState(false);
 
-  const [logData, setLogData] = useState(log_data);
+  const [logData, setLogData] = useState(asyncLogData);
 
   //=========================================================================================
   // handle button click
   const handleButtonClick = () => {
     // Handle registration logic here
-    console.log(' button pressed');
+    console.log('userToken = ', userToken);
+    console.log('buttonLoading = ', buttonLoading);
+    console.log('otpSent = ', otpSent);
+    console.log('showResend = ', showResend);
+    console.log('phoneNumberVerified = ', phoneNumberVerified);
+    console.log('asyncLogData = ', asyncLogData);
+    console.log('logData = ', logData);
 
     if (!phoneNumberVerified) {
       // otp sending and phone number verification
@@ -183,7 +188,7 @@ const verifyNumberFunc = async () => {
         };
         // Call saveAsyncStorage and wait for it to complete
         setUserToken(verifyData.payload.token)
-        await saveAsyncStorage(updatedLogData);
+        await saveAsyncStorage(updatedLogData, 'register_required');
 
         setPhoneNumberVerified(true);
       }else{ // if user already registered
@@ -200,7 +205,7 @@ const verifyNumberFunc = async () => {
         };
 
         // Call saveAsyncStorage and wait for it to complete
-        await saveAsyncStorage(updatedLogData);
+        await saveAsyncStorage(updatedLogData, 'registered');
 
         // Check the updated logData.log_status value
         //navigation.navigate('Home');
@@ -251,7 +256,7 @@ const verifyNumberFunc = async () => {
         };
 
         // Call saveAsyncStorage and wait for it to complete
-        await saveAsyncStorage(updatedLogData);
+        await saveAsyncStorage(updatedLogData, 'registered');
 
         // Check the updated logData.log_status value
         //navigation.navigate('Home');

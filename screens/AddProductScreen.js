@@ -169,10 +169,10 @@ const AddProductScreen = ({ route, navigation }) => {
         formData.append('proPrice', proPrice);
         formData.append('proQty', proQty);
 
-        const response = await addProduct(formData); // Call addProduct with the newProductData
-        //console.log('check2')
+        //console.log('send form data - ', formData)
 
-        console.log(response);
+        const response = await addProduct(formData); // Call addProduct with the newProductData
+        console.log(response)
 
         let msg = proId != '' ? 'Updated' : 'Added'
 

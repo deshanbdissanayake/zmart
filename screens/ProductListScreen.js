@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, SafeAreaView, TextInput, TouchableOpacity, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, SafeAreaView, TextInput, TouchableOpacity, RefreshControl, ScrollView } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from 'react-native-vector-icons';
 
 import colors from '../assets/colors/colors';
@@ -8,7 +8,7 @@ import ProductItem from '../components/products/ProductItem';
 
 import { getProducts } from '../assets/data/product';
 
-const ProductListScreen = ({ route }) => {
+const ProductListScreen = ({ navigation, route }) => {
 
   const { propsData } = route.params;
   const title = propsData.type === 'myProducts' ? 'My Product List' : 'All Suppliers Products';
@@ -45,7 +45,6 @@ const ProductListScreen = ({ route }) => {
     setIsLoading(true);
     try {
       const response = await getProducts(propsData.type);
-      //console.log(response)
       setProducts(response);
       setPrevProducts(response);
     } catch (error) {
@@ -132,6 +131,10 @@ const ProductListScreen = ({ route }) => {
     setRefreshing(false);
   };
 
+  const addNewProduct = () => {
+    navigation.navigate('Create Product');
+  }
+
   const renderLoadingIndicator = () => (
     <View style={styles.loadingContainer}>
       <ActivityIndicator size="large" />
@@ -160,22 +163,45 @@ const ProductListScreen = ({ route }) => {
           {selectedCount > 0 ? <Text>{selectedCount} Selected</Text> : null} 
         </View>
 
-        <FlatList
-          data={products.filter(item => item.status !== 'delete')}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item }) => (
-            <ProductItem
-              product={item}
-              props={propsForItems}
-              type={propsData.type}
-              updateProductData={updateProductData}
-            />
-          )}
-          showsVerticalScrollIndicator={false}
-          refreshControl={ // Adding RefreshControl
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-        />
+        {products.length > 0 ? (
+          <FlatList
+            data={products.filter(item => item.status !== 'delete')}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item }) => (
+              <ProductItem
+                product={item}
+                props={propsForItems}
+                type={propsData.type}
+                updateProductData={updateProductData}
+              />
+            )}
+            showsVerticalScrollIndicator={false}
+            refreshControl={ // Adding RefreshControl
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+          />
+        ) : (
+          <ScrollView
+            style={styles.container}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                progressBackgroundColor={colors.bgLight}
+              />
+            }
+          >
+            <View style={styles.productErrorWrapper}>
+              <Text style={styles.productErrorText}>No Products Yet!</Text>
+            </View>
+            {propsData.type === 'myProducts' && (
+              <TouchableOpacity style={styles.addNewProductStyles} onPress={addNewProduct}>
+                <Ionicons name="add-circle-outline" size={50} color={colors.gray} />
+              </TouchableOpacity>
+            )}
+          </ScrollView>
+        ) }
+        
       </View>
       <Footer />
       {/*propsData.type === 'myProducts' ? (
@@ -340,6 +366,24 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: colors.white,
     fontSize: 12,
+  },
+  productErrorWrapper: {
+    backgroundColor: colors.gray,
+    paddingVertical: 5,
+  },
+  productErrorText: {
+    textAlign:'center',
+    fontStyle: 'italic'
+  },
+  addNewProductStyles: {
+    height: 100,
+    marginVertical: 20,
+    borderWidth: 1,
+    borderColor: colors.gray,
+    borderRadius: 10,
+    borderStyle: 'dashed',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

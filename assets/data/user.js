@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // After clicking the Send OTP button
 const sendOtp = async (phoneNumber) => {
-  const url = `https://v2.genzo.lk/App_auth/auth_mobile?mob=${phoneNumber}`;
+  /*const url = `https://v2.genzo.lk/App_auth/auth_mobile?mob=${phoneNumber}`;
 
   try {
     const response = await fetch(url);
@@ -11,8 +11,8 @@ const sendOtp = async (phoneNumber) => {
   } catch (error) {
     console.error('Failed to send OTP request in user.js:', error);
     return { payload: "Error", ref: "", stt: "error" };
-  }
-  //return { payload: "ok", ref: "", stt: "ok" }; 
+  }*/
+  return { payload: "ok", ref: "", stt: "ok" }; 
 };
 
 // Verify phone number after confirming OTP
