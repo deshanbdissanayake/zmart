@@ -27,7 +27,7 @@ const Header = () => {
         </View>
         <View style={styles.centerContainer}>
           {/* Logo */}
-          <Image source={require('../../assets/images/app/logo.png')} style={styles.logo} />
+          {/*<Image source={require('../../assets/images/app/logo.png')} style={styles.logo} />*/}
           {/* Name */}
           <Text style={styles.name}>{log_data.sys_name}</Text>
         </View>
@@ -55,6 +55,7 @@ const styles = StyleSheet.create({
   },
   centerContainer: {
     flex: 2,
+    justifyContent: 'center',
     alignItems: 'center',
     flexDirection: 'row',
   },

@@ -2,7 +2,7 @@
 //these are just dummy data for asyncstorage. when you are checking data use data in asyncstorage.
 //==========================================================================================================
 const log_data = {
-    sys_name : 'WHOLESALE',
+    sys_name : 'Z MART',
     log_status : false,
     log_userType : 'supplier',
     log_userStatus : 'active',

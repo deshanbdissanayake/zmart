@@ -3,6 +3,7 @@ import { Keyboard } from 'react-native';
 
 import { AuthProvider } from './context/AuthContext';
 import AppNav from './navigation/AppNav';
+import SplashScreen from './screens/SplashScreen';
 
 const App = () => {
 
