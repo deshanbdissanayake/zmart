@@ -18,7 +18,7 @@ const SplashScreen = ({ navigation }) => {
           source={require('../assets/images/app/logo.png')}
           style={styles.logo}
         />
-        <Text style={styles.logoText}>{log_data.sys_name}</Text>
+        {/*<Text style={styles.logoText}>{log_data.sys_name}</Text>*/}
       </View>
       <View style={styles.circleTopRight} />
       <View style={styles.circleBottomLeft} />
@@ -34,7 +34,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logoWrapper:{
-    marginBottom: 50,
     justifyContent: 'center',
     alignItems: 'center',
   },

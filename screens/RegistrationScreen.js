@@ -297,10 +297,9 @@ const verifyNumberFunc = async () => {
         ): ('')}
 
         <View style={styles.registrationWrapper}>
-          <Text style={styles.registrationTitle}>Create an Account</Text>
+          <Text style={styles.registrationTitle}>Get Started</Text>
           <Text style={styles.registrationDescription}>
-            In publishing and graphic design, Lorem ipsum is a placeholder text
-            commonly used.
+            We extend a warm welcome to you! We hope you have a great experience with us.
           </Text>
         </View>
       </View>
