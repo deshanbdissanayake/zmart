@@ -145,23 +145,31 @@ const AddProductScreen = ({ route, navigation }) => {
           name: 'image.jpg',
           type: 'image/jpeg',
         });
-        formData.append('image2', {
-          uri: image2,
-          name: 'image.jpg',
-          type: 'image/jpeg',
-        });
-        formData.append('image3', {
-          uri: image3,
-          name: 'image.jpg',
-          type: 'image/jpeg',
-        });
+        if(image2 != ''){
+          formData.append('image2', {
+            uri: image2,
+            name: 'image.jpg',
+            type: 'image/jpeg',
+          });
+        }else{
+          formData.append('image2', '')
+        }
+        if(image3 != ''){
+          formData.append('image3', {
+            uri: image3,
+            name: 'image.jpg',
+            type: 'image/jpeg',
+          });
+        }else{
+          formData.append('image3', '')
+        }
         formData.append('proId', proId);
         formData.append('proName', proName);
         formData.append('proDes', proDesc);
         formData.append('proPrice', proPrice);
         formData.append('proQty', proQty);
 
-        //console.log('send form data - ', formData)
+        console.log('send form data - ', formData)
 
         const response = await addProduct(formData); // Call addProduct with the newProductData
         console.log(response)
