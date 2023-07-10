@@ -24,7 +24,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.deshanbdissanayake.snack5423fc197826411aad934f538c8ea315"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -35,11 +36,15 @@
         {
           "photosPermission": "custom photos permission",
           "cameraPermission": "Allow this app to open the camera",
-
           "//": "Disables the microphone permission",
           "microphonePermission": false
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "1d3b31ae-565b-4d63-a549-1fb7cb921658"
+      }
+    }
   }
 }

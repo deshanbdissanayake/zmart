@@ -117,10 +117,6 @@ const AddProductScreen = ({ route, navigation }) => {
       errors.proNameError = true;
     }
 
-    if (proDesc.trim() === '') {
-      errors.proDescError = true;
-    }
-
     if (proPrice.trim() === '' || parseFloat(proPrice) < 0) {
       errors.proPriceError = true;
     }
@@ -131,14 +127,6 @@ const AddProductScreen = ({ route, navigation }) => {
 
     if (image1 === '') {
       errors.image1Error = true;
-    }
-
-    if (image2 === '') {
-      errors.image2Error = true;
-    }
-
-    if (image3 === '') {
-      errors.image3Error = true;
     }
 
     setFormErrors(errors);
@@ -296,9 +284,9 @@ const AddProductScreen = ({ route, navigation }) => {
                     <ImageButton imageNumber={3} />
                   </View>
 
-                  {(formErrors.image1Error || formErrors.image2Error || formErrors.image3Error) && (
+                  {(formErrors.image1Error) && (
                     <View style={styles.errorWrapper}>
-                      <Text style={styles.errorMessage}>Please upload all three images!</Text>
+                      <Text style={styles.errorMessage}>Please upload first image!</Text>
                     </View>
                   )}
                 </View>
@@ -317,12 +305,6 @@ const AddProductScreen = ({ route, navigation }) => {
                       maxLength={250}
                     />
                   </View>
-
-                  {formErrors.proDescError && (
-                    <View style={styles.errorWrapper}>
-                      <Text style={styles.errorMessage}>Product Description is required!</Text>
-                    </View>
-                  )}
                 </View>
 
                 <View style={styles.formGroup}>
